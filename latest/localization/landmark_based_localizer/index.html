@@ -15368,8 +15368,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#landmark_tf_caster-node" class="md-nav__link">
-    landmark_tf_caster node
+  <a href="#landmark_parser" class="md-nav__link">
+    landmark_parser
   </a>
   
 </li>
@@ -15377,26 +15377,6 @@
           <li class="md-nav__item">
   <a href="#landmark-based-localizer-packages" class="md-nav__link">
     Landmark based localizer packages
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inputs-outputs" class="md-nav__link">
-    Inputs / Outputs
-  </a>
-  
-    <nav class="md-nav" aria-label="Inputs / Outputs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#landmark_tf_caster-node_1" class="md-nav__link">
-    landmark_tf_caster node
   </a>
   
 </li>
@@ -15459,9 +15439,9 @@
 <p>This calculated ego pose is passed to the EKF, where it is fused with the twist information and used to estimate a more accurate ego pose.</p>
 <h2 id="node-diagram">Node diagram<a class="headerlink" href="#node-diagram" title="Permanent link">#</a></h2>
 <p><img alt="node diagram" src="doc_image/node_diagram.drawio.svg"></p>
-<h3 id="landmark_tf_caster-node"><code>landmark_tf_caster</code> node<a class="headerlink" href="#landmark_tf_caster-node" title="Permanent link">#</a></h3>
+<h3 id="landmark_parser"><code>landmark_parser</code><a class="headerlink" href="#landmark_parser" title="Permanent link">#</a></h3>
 <p>The definitions of the landmarks written to the map are introduced in the next section. See <code>Map Specifications</code>.</p>
-<p>The <code>landmark_tf_caster</code> node publishes the TF from the map to the landmark.</p>
+<p>The <code>landmark_parser</code> is a utility package to load landmarks from the map.</p>
 <ul>
 <li>Translation : The center of the four vertices of the landmark</li>
 <li>Rotation : Let the vertex numbers be 1, 2, 3, 4 counterclockwise as shown in the next section. Direction is defined as the cross product of the vector from 1 to 2 and the vector from 2 to 3.</li>
@@ -15474,44 +15454,8 @@ So, if the 4 vertices are considered as forming a tetrahedron and its volume exc
 <li>ar_tag_based_localizer</li>
 <li>etc.</li>
 </ul>
-<h2 id="inputs-outputs">Inputs / Outputs<a class="headerlink" href="#inputs-outputs" title="Permanent link">#</a></h2>
-<h3 id="landmark_tf_caster-node_1"><code>landmark_tf_caster</code> node<a class="headerlink" href="#landmark_tf_caster-node_1" title="Permanent link">#</a></h3>
-<h4 id="input">Input<a class="headerlink" href="#input" title="Permanent link">#</a></h4>
-<table>
-<thead>
-<tr>
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>~/input/lanelet2_map</code></td>
-<td align="left"><code>autoware_auto_mapping_msgs::msg::HADMapBin</code></td>
-<td align="left">Data of lanelet2</td>
-</tr>
-</tbody>
-</table>
-<h4 id="output">Output<a class="headerlink" href="#output" title="Permanent link">#</a></h4>
-<table>
-<thead>
-<tr>
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>tf_static</code></td>
-<td align="left"><code>geometry_msgs::msg::TransformStamped</code></td>
-<td align="left">TF from map to tag</td>
-</tr>
-</tbody>
-</table>
 <h2 id="map-specifications">Map specifications<a class="headerlink" href="#map-specifications" title="Permanent link">#</a></h2>
-<p>For this package to work correctly, the poses of the landmarks must be specified in the Lanelet2 map format that <code>map_loader</code> and <code>landmark_tf_caster</code> can interpret.</p>
+<p>For this package to work correctly, the poses of the landmarks must be specified in the Lanelet2 map format that <code>map_loader</code> and <code>landmark_parser</code> can interpret.</p>
 <p>The four vertices of a landmark are defined counterclockwise.</p>
 <p>The order of the four vertices is defined as follows. In the coordinate system of a landmark,</p>
 <ul>

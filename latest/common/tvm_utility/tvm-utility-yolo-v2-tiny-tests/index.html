@@ -3819,6 +3819,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gpu-backend" class="md-nav__link">
     GPU backend
   </a>
@@ -15415,6 +15422,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gpu-backend" class="md-nav__link">
     GPU backend
   </a>
@@ -15445,23 +15459,73 @@ framework. This example pipeline executes the
 <a href="https://pjreddie.com/darknet/yolov2/">YOLO V2 Tiny</a> model and decodes its
 output.</p>
 <h2 id="compiling-the-example">Compiling the Example<a class="headerlink" href="#compiling-the-example" title="Permanent link">#</a></h2>
+<!-- cspell: ignore DBUILD -->
+
 <ol>
-<li>Download an example image to be used as test input. this image needs to be
-   saved in the <code>artifacts/yolo_v2_tiny/</code> folder</li>
-</ol>
+<li>
+<p>Check if model was downloaded during the env preparation step by ansible and
+   models files exist in the folder $HOME/autoware_data/tvm_utility/models/yolo_v2_tiny.</p>
+<p>If not you can download them manually, see <a href="https://github.com/autowarefoundation/autoware/tree/main/ansible/roles/artifacts">Manual Artifacts Downloading</a>.</p>
+</li>
+<li>
+<p>Download an example image to be used as test input. This image needs to be
+   saved in the <code>artifacts/yolo_v2_tiny/</code> folder.</p>
 <div class="highlight"><pre><span></span><code>curl<span class="w"> </span>https://raw.githubusercontent.com/pjreddie/darknet/master/data/dog.jpg<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>&gt;<span class="w"> </span>artifacts/yolo_v2_tiny/test_image_0.jpg
+&gt;<span class="w"> </span>artifacts/yolo_v2_tiny/test_image_0.jpg
 </code></pre></div>
-<ol>
-<li>Build and test with the <code>DOWNLOAD_ARTIFACTS</code> flag set.</li>
+</li>
+<li>
+<p>Build.</p>
+<div class="highlight"><pre><span></span><code>colcon<span class="w"> </span>build<span class="w"> </span>--packages-up-to<span class="w"> </span>tvm_utility<span class="w"> </span>--cmake-args<span class="w"> </span>-DBUILD_EXAMPLE<span class="o">=</span>ON
+</code></pre></div>
+</li>
+<li>
+<p>Run.</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>launch<span class="w"> </span>tvm_utility<span class="w"> </span>yolo_v2_tiny_example.launch.xml
+</code></pre></div>
+</li>
 </ol>
-<div class="highlight"><pre><span></span><code>colcon<span class="w"> </span>build<span class="w"> </span>--packages-up-to<span class="w"> </span>tvm_utility<span class="w"> </span>--cmake-args<span class="w"> </span>-DDOWNLOAD_ARTIFACTS<span class="o">=</span>ON
-colcon<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--packages-select<span class="w"> </span>tvm_utility
-</code></pre></div>
+<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Default Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image_filename</code></td>
+<td>string</td>
+<td><code>$(find-pkg-share tvm_utility)/artifacts/yolo_v2_tiny/test_image_0.jpg</code></td>
+<td>Filename of the image on which to run the inference.</td>
+</tr>
+<tr>
+<td><code>label_filename</code></td>
+<td>string</td>
+<td><code>$(find-pkg-share tvm_utility)/artifacts/yolo_v2_tiny/labels.txt</code></td>
+<td>Name of file containing the human readable names of the classes. One class on each line.</td>
+</tr>
+<tr>
+<td><code>anchor_filename</code></td>
+<td>string</td>
+<td><code>$(find-pkg-share tvm_utility)/artifacts/yolo_v2_tiny/anchors.csv</code></td>
+<td>Name of file containing the anchor values for the network. Each line is one anchor. each anchor has 2 comma separated floating point values.</td>
+</tr>
+<tr>
+<td><code>data_path</code></td>
+<td>string</td>
+<td><code>$(env HOME)/autoware_data</code></td>
+<td>Packages data and artifacts directory path.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="gpu-backend">GPU backend<a class="headerlink" href="#gpu-backend" title="Permanent link">#</a></h2>
 <p>Vulkan is supported by default by the tvm_vendor package.
 It can be selected by setting the <code>tvm_utility_BACKEND</code> variable:</p>
-<div class="highlight"><pre><span></span><code>colcon<span class="w"> </span>build<span class="w"> </span>--packages-up-to<span class="w"> </span>tvm_utility<span class="w"> </span>--cmake-args<span class="w"> </span>-DDOWNLOAD_ARTIFACTS<span class="o">=</span>ON<span class="w"> </span>-Dtvm_utility_BACKEND<span class="o">=</span>vulkan
+<div class="highlight"><pre><span></span><code>colcon<span class="w"> </span>build<span class="w"> </span>--packages-up-to<span class="w"> </span>tvm_utility<span class="w"> </span>-Dtvm_utility_BACKEND<span class="o">=</span>vulkan
 </code></pre></div></div>
 
 
