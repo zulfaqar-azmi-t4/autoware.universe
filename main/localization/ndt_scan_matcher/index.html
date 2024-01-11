@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14624,8 +14656,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#enabling-the-dynamic-map-loading-feature" class="md-nav__link">
-    Enabling the dynamic map loading feature
+  <a href="#notes-for-dynamic-map-loading" class="md-nav__link">
+    Notes for dynamic map loading
   </a>
   
 </li>
@@ -14731,11 +14763,6 @@
 <td><code>ekf_pose_with_covariance</code></td>
 <td><code>geometry_msgs::msg::PoseWithCovarianceStamped</code></td>
 <td>initial pose</td>
-</tr>
-<tr>
-<td><code>pointcloud_map</code></td>
-<td><code>sensor_msgs::msg::PointCloud2</code></td>
-<td>map pointcloud</td>
 </tr>
 <tr>
 <td><code>points_raw</code></td>
@@ -15077,23 +15104,6 @@ The color of the trajectory indicates the error (meter) from the reference traje
 <p>Using the feature, <code>ndt_scan_matcher</code> can theoretically handle any large size maps in terms of memory usage. (Note that it is still possible that there exists a limitation due to other factors, e.g. floating-point error)</p>
 <p><img src="./media/differential_area_loading.gif" alt="drawing" width="400"></p>
 <h3 id="additional-interfaces">Additional interfaces<a class="headerlink" href="#additional-interfaces" title="Permanent link">#</a></h3>
-<h4 id="additional-inputs">Additional inputs<a class="headerlink" href="#additional-inputs" title="Permanent link">#</a></h4>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>input_ekf_odom</code></td>
-<td><code>nav_msgs::msg::Odometry</code></td>
-<td>Vehicle localization results (used for map update decision)</td>
-</tr>
-</tbody>
-</table>
 <h4 id="additional-outputs">Additional outputs<a class="headerlink" href="#additional-outputs" title="Permanent link">#</a></h4>
 <table>
 <thead>
@@ -15139,11 +15149,6 @@ The color of the trajectory indicates the error (meter) from the reference traje
 </thead>
 <tbody>
 <tr>
-<td><code>use_dynamic_map_loading</code></td>
-<td>bool</td>
-<td>Flag to enable dynamic map loading feature for NDT (TRUE by default)</td>
-</tr>
-<tr>
 <td><code>dynamic_map_loading_update_distance</code></td>
 <td>double</td>
 <td>Distance traveled to load new map(s)</td>
@@ -15160,13 +15165,8 @@ The color of the trajectory indicates the error (meter) from the reference traje
 </tr>
 </tbody>
 </table>
-<h3 id="enabling-the-dynamic-map-loading-feature">Enabling the dynamic map loading feature<a class="headerlink" href="#enabling-the-dynamic-map-loading-feature" title="Permanent link">#</a></h3>
-<p>To use dynamic map loading feature for <code>ndt_scan_matcher</code>, you also need to appropriately configure some other settings outside of this node.
-Follow the next two instructions.</p>
-<ol>
-<li>enable dynamic map loading interface in <code>pointcloud_map_loader</code> (by setting <code>enable_differential_load</code> to true in the package)</li>
-<li>split the PCD files into grids (recommended size: 20[m] x 20[m])</li>
-</ol>
+<h3 id="notes-for-dynamic-map-loading">Notes for dynamic map loading<a class="headerlink" href="#notes-for-dynamic-map-loading" title="Permanent link">#</a></h3>
+<p>To use dynamic map loading feature for <code>ndt_scan_matcher</code>, you also need to split the PCD files into grids (recommended size: 20[m] x 20[m])</p>
 <p>Note that the dynamic map loading may FAIL if the map is split into two or more large size map (e.g. 1000[m] x 1000[m]). Please provide either of</p>
 <ul>
 <li>one PCD map file</li>
@@ -15177,47 +15177,17 @@ Follow the next two instructions.</p>
 <thead>
 <tr>
 <th align="center">PCD files</th>
-<th align="center"><code>use_dynamic_map_loading</code></th>
-<th align="center"><code>enable_differential_load</code></th>
 <th align="center">How NDT loads map(s)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="center">single file</td>
-<td align="center">true</td>
-<td align="center">true</td>
-<td align="center">at once (standard)</td>
-</tr>
-<tr>
-<td align="center">single file</td>
-<td align="center">true</td>
-<td align="center">false</td>
-<td align="center"><strong>does NOT work</strong></td>
-</tr>
-<tr>
-<td align="center">single file</td>
-<td align="center">false</td>
-<td align="center">true/false</td>
 <td align="center">at once (standard)</td>
 </tr>
 <tr>
 <td align="center">multiple files</td>
-<td align="center">true</td>
-<td align="center">true</td>
 <td align="center">dynamically</td>
-</tr>
-<tr>
-<td align="center">multiple files</td>
-<td align="center">true</td>
-<td align="center">false</td>
-<td align="center"><strong>does NOT work</strong></td>
-</tr>
-<tr>
-<td align="center">multiple files</td>
-<td align="center">false</td>
-<td align="center">true/false</td>
-<td align="center">at once (standard)</td>
 </tr>
 </tbody>
 </table>
