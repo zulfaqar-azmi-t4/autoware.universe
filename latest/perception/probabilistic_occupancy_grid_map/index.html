@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14545,6 +14577,19 @@
     Other parameters
   </a>
   
+    <nav class="md-nav" aria-label="Other parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    Test
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -14573,6 +14618,7 @@
 <ul>
 <li><a href="pointcloud-based-occupancy-grid-map/">Pointcloud based occupancy grid map</a></li>
 <li><a href="laserscan-based-occupancy-grid-map/">Laserscan based occupancy grid map</a></li>
+<li><a href="synchronized_grid_map_fusion/">Grid map fusion</a></li>
 </ul>
 <h2 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">#</a></h2>
 <p>Occupancy grid map is generated on <code>map_frame</code>, and grid orientation is fixed.</p>
@@ -14755,7 +14801,19 @@
 <td>only for laserscan based method. If true, the node subscribe both obstacle and raw pointcloud</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h3 id="test">Test<a class="headerlink" href="#test" title="Permanent link">#</a></h3>
+<p>This package provides unit tests using <code>gtest</code>.
+You can run the test by the following command.</p>
+<div class="highlight"><pre><span></span><code>colcon<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--packages-select<span class="w"> </span>probabilistic_occupancy_grid_map<span class="w"> </span>--event-handlers<span class="w"> </span>console_direct+
+</code></pre></div>
+<p>Test contains the following.</p>
+<ul>
+<li>Unit test for cost value conversion function</li>
+<li>Unit test for utility functions</li>
+<li>Unit test for occupancy grid map fusion functions</li>
+<li>Input/Output test for pointcloud based occupancy grid map</li>
+</ul></div>
 
 
 

@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14676,7 +14708,7 @@ Currently, it supports the following two types:</p>
 <p>NOTE: <strong>We strongly recommend to use divided maps when using large pointcloud map to enable the latter two features (partial and differential load). Please go through the prerequisites section for more details, and follow the instruction for dividing the map and preparing the metadata.</strong></p>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h3>
 <h4 id="prerequisites-on-pointcloud-map-files">Prerequisites on pointcloud map file(s)<a class="headerlink" href="#prerequisites-on-pointcloud-map-files" title="Permanent link">#</a></h4>
-<p>You may provide either a single .pcd file or multiple .pcd files. If you are using multiple PCD data and either of <code>enable_partial_load</code>, <code>enable_differential_load</code> or <code>enable_selected_load</code> are set true, it MUST obey the following rules:</p>
+<p>You may provide either a single .pcd file or multiple .pcd files. If you are using multiple PCD data, it MUST obey the following rules:</p>
 <ol>
 <li><strong>The pointcloud map should be projected on the same coordinate defined in <code>map_projection_loader</code></strong>, in order to be consistent with the lanelet2 map and other packages that converts between local and geodetic coordinates. For more information, please refer to <a href="https://github.com/autowarefoundation/autoware.universe/tree/main/map/map_projection_loader/README.md">the readme of <code>map_projection_loader</code></a>.</li>
 <li><strong>It must be divided by straight lines parallel to the x-axis and y-axis</strong>. The system does not support division by diagonal lines or curved lines.</li>
@@ -14685,7 +14717,6 @@ Currently, it supports the following two types:</p>
 <li><strong>All the split maps should not overlap with each other.</strong></li>
 <li><strong>Metadata file should also be provided.</strong> The metadata structure description is provided below.</li>
 </ol>
-<p>Note that these rules are not applicable when <code>enable_partial_load</code>, <code>enable_differential_load</code> and <code>enable_selected_load</code> are all set false. In this case, however, you also need to disable dynamic map loading mode for other nodes as well (<a href="https://github.com/autowarefoundation/autoware.universe/tree/main/localization/ndt_scan_matcher">ndt_scan_matcher</a> and <a href="https://github.com/autowarefoundation/autoware.universe/tree/main/perception/compare_map_segmentation">compare_map_segmentation</a> as of June 2023).</p>
 <h4 id="metadata-structure">Metadata structure<a class="headerlink" href="#metadata-structure" title="Permanent link">#</a></h4>
 <p>The metadata should look like this:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">x_resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20.0</span>
@@ -14765,12 +14796,6 @@ Please see <a href="https://github.com/autowarefoundation/autoware_msgs/tree/mai
 <td align="left">enable_partial_load</td>
 <td align="left">bool</td>
 <td align="left">A flag to enable partial pointcloud map server</td>
-<td align="left">false</td>
-</tr>
-<tr>
-<td align="left">enable_differential_load</td>
-<td align="left">bool</td>
-<td align="left">A flag to enable differential pointcloud map server</td>
 <td align="left">false</td>
 </tr>
 <tr>

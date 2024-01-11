@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14561,6 +14593,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#xbox-joystick-key-map" class="md-nav__link">
+    XBOX Joystick Key Map
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -14701,6 +14740,11 @@
 <td><code>brake_sensitivity</code></td>
 <td>double</td>
 <td>sensitivity to calculate deceleration for external API (commanded acceleration is pow(operation, 1 / sensitivity))</td>
+</tr>
+<tr>
+<td><code>raw_control</code></td>
+<td>bool</td>
+<td>skip input odometry if true</td>
 </tr>
 <tr>
 <td><code>velocity_gain</code></td>
@@ -14879,6 +14923,85 @@
 <tr>
 <td>Vehicle Disengage</td>
 <td>△</td>
+</tr>
+</tbody>
+</table>
+<h2 id="xbox-joystick-key-map">XBOX Joystick Key Map<a class="headerlink" href="#xbox-joystick-key-map" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Button</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Acceleration</td>
+<td>RT</td>
+</tr>
+<tr>
+<td>Brake</td>
+<td>LT</td>
+</tr>
+<tr>
+<td>Steering</td>
+<td>Left Stick Left Right</td>
+</tr>
+<tr>
+<td>Shift up</td>
+<td>Cursor Up</td>
+</tr>
+<tr>
+<td>Shift down</td>
+<td>Cursor Down</td>
+</tr>
+<tr>
+<td>Shift Drive</td>
+<td>Cursor Left</td>
+</tr>
+<tr>
+<td>Shift Reverse</td>
+<td>Cursor Right</td>
+</tr>
+<tr>
+<td>Turn Signal Left</td>
+<td>LB</td>
+</tr>
+<tr>
+<td>Turn Signal Right</td>
+<td>RB</td>
+</tr>
+<tr>
+<td>Clear Turn Signal</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Gate Mode</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Emergency Stop</td>
+<td>View</td>
+</tr>
+<tr>
+<td>Clear Emergency Stop</td>
+<td>Menu</td>
+</tr>
+<tr>
+<td>Autoware Engage</td>
+<td>X</td>
+</tr>
+<tr>
+<td>Autoware Disengage</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Vehicle Engage</td>
+<td>Left Stick Button</td>
+</tr>
+<tr>
+<td>Vehicle Disengage</td>
+<td>Right Stick Button</td>
 </tr>
 </tbody>
 </table></div>

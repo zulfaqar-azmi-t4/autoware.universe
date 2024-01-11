@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14521,13 +14553,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launch" class="md-nav__link">
-    Launch
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#node" class="md-nav__link">
     Node
   </a>
@@ -14620,6 +14645,13 @@
           <li class="md-nav__item">
   <a href="#for-process-noise" class="md-nav__link">
     For process noise
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simple-1d-filter-parameters" class="md-nav__link">
+    Simple 1D Filter Parameters
   </a>
   
 </li>
@@ -14799,86 +14831,90 @@
   <img src="./media/calculation_delta_from_pitch.png" width="800">
 </p>
 
-<h2 id="launch">Launch<a class="headerlink" href="#launch" title="Permanent link">#</a></h2>
-<p>The <code>ekf_localizer</code> starts with the default parameters with the following command.</p>
-<div class="highlight"><pre><span></span><code>roslaunch<span class="w"> </span>ekf_localizer<span class="w"> </span>ekf_localizer.launch
-</code></pre></div>
-<p>The parameters and input topic names can be set in the <code>ekf_localizer.launch</code> file.</p>
 <h2 id="node">Node<a class="headerlink" href="#node" title="Permanent link">#</a></h2>
 <h3 id="subscribed-topics">Subscribed Topics<a class="headerlink" href="#subscribed-topics" title="Permanent link">#</a></h3>
-<ul>
-<li>
-<p>measured_pose_with_covariance (geometry_msgs/PoseWithCovarianceStamped)</p>
-<p>Input pose source with the measurement covariance matrix.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>measured_twist_with_covariance (geometry_msgs/TwistWithCovarianceStamped)</p>
-<p>Input twist source with the measurement covariance matrix.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>initialpose (geometry_msgs/PoseWithCovarianceStamped)</p>
-<p>Initial pose for EKF. The estimated pose is initialized with zeros at the start. It is initialized with this message whenever published.</p>
-</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>measured_pose_with_covariance</code></td>
+<td><code>geometry_msgs::msg::PoseWithCovarianceStamped</code></td>
+<td>Input pose source with the measurement covariance matrix.</td>
+</tr>
+<tr>
+<td><code>measured_twist_with_covariance</code></td>
+<td><code>geometry_msgs::msg::TwistWithCovarianceStamped</code></td>
+<td>Input twist source with the measurement covariance matrix.</td>
+</tr>
+<tr>
+<td><code>initialpose</code></td>
+<td><code>geometry_msgs::msg::PoseWithCovarianceStamped</code></td>
+<td>Initial pose for EKF. The estimated pose is initialized with zeros at the start. It is initialized with this message whenever published.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="published-topics">Published Topics<a class="headerlink" href="#published-topics" title="Permanent link">#</a></h3>
-<ul>
-<li>
-<p>ekf_odom (nav_msgs/Odometry)</p>
-<p>Estimated odometry.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_pose (geometry_msgs/PoseStamped)</p>
-<p>Estimated pose.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_pose_with_covariance (geometry_msgs/PoseWithCovarianceStamped)</p>
-<p>Estimated pose with covariance.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_biased_pose (geometry_msgs/PoseStamped)</p>
-<p>Estimated pose including the yaw bias</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_biased_pose_with_covariance (geometry_msgs/PoseWithCovarianceStamped)</p>
-<p>Estimated pose with covariance including the yaw bias</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_twist (geometry_msgs/TwistStamped)</p>
-<p>Estimated twist.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>ekf_twist_with_covariance (geometry_msgs/TwistWithCovarianceStamped)</p>
-<p>The estimated twist with covariance.</p>
-</li>
-</ul>
-<ul>
-<li>
-<p>diagnostics (diagnostic_msgs/DiagnosticArray)</p>
-<p>The diagnostic information.</p>
-</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ekf_odom</code></td>
+<td><code>nav_msgs::msg::Odometry</code></td>
+<td>Estimated odometry.</td>
+</tr>
+<tr>
+<td><code>ekf_pose</code></td>
+<td><code>geometry_msgs::msg::PoseStamped</code></td>
+<td>Estimated pose.</td>
+</tr>
+<tr>
+<td><code>ekf_pose_with_covariance</code></td>
+<td><code>geometry_msgs::msg::PoseWithCovarianceStamped</code></td>
+<td>Estimated pose with covariance.</td>
+</tr>
+<tr>
+<td><code>ekf_biased_pose</code></td>
+<td><code>geometry_msgs::msg::PoseStamped</code></td>
+<td>Estimated pose including the yaw bias</td>
+</tr>
+<tr>
+<td><code>ekf_biased_pose_with_covariance</code></td>
+<td><code>geometry_msgs::msg::PoseWithCovarianceStamped</code></td>
+<td>Estimated pose with covariance including the yaw bias</td>
+</tr>
+<tr>
+<td><code>ekf_twist</code></td>
+<td><code>geometry_msgs::msg::TwistStamped</code></td>
+<td>Estimated twist.</td>
+</tr>
+<tr>
+<td><code>ekf_twist_with_covariance</code></td>
+<td><code>geometry_msgs::msg::TwistWithCovarianceStamped</code></td>
+<td>The estimated twist with covariance.</td>
+</tr>
+<tr>
+<td><code>diagnostics</code></td>
+<td><code>diagnostics_msgs::msg::DiagnosticArray</code></td>
+<td>The diagnostic information.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="published-tf">Published TF<a class="headerlink" href="#published-tf" title="Permanent link">#</a></h3>
 <ul>
-<li>
-<p>base_link</p>
-<p>TF from "map" coordinate to estimated pose.</p>
-</li>
+<li>base_link
+  TF from <code>map</code> coordinate to estimated pose.</li>
 </ul>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">#</a></h2>
 <h3 id="predict">Predict<a class="headerlink" href="#predict" title="Permanent link">#</a></h3>
@@ -14916,6 +14952,12 @@
 <td align="left">double</td>
 <td align="left">Frequency for tf broadcasting [Hz]</td>
 <td align="left">10.0</td>
+</tr>
+<tr>
+<td align="left">publish_tf</td>
+<td align="left">bool</td>
+<td align="left">Whether to publish tf</td>
+<td align="left">true</td>
 </tr>
 <tr>
 <td align="left">extend_state_step</td>
@@ -15037,6 +15079,37 @@
 </tbody>
 </table>
 <p>note: process noise for positions x &amp; y are calculated automatically from nonlinear dynamics.</p>
+<h3 id="simple-1d-filter-parameters">Simple 1D Filter Parameters<a class="headerlink" href="#simple-1d-filter-parameters" title="Permanent link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+<th align="left">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">z_filter_proc_dev</td>
+<td align="left">double</td>
+<td align="left">Simple1DFilter - Z filter process deviation</td>
+<td align="left">1.0</td>
+</tr>
+<tr>
+<td align="left">roll_filter_proc_dev</td>
+<td align="left">double</td>
+<td align="left">Simple1DFilter - Roll filter process deviation</td>
+<td align="left">0.01</td>
+</tr>
+<tr>
+<td align="left">pitch_filter_proc_dev</td>
+<td align="left">double</td>
+<td align="left">Simple1DFilter - Pitch filter process deviation</td>
+<td align="left">0.01</td>
+</tr>
+</tbody>
+</table>
 <h3 id="for-diagnostics">For diagnostics<a class="headerlink" href="#for-diagnostics" title="Permanent link">#</a></h3>
 <table>
 <thead>
@@ -15118,7 +15191,9 @@ Increasing the number will improve the smoothness of the estimation, but may hav
 <h2 id="kalman-filter-model">Kalman Filter Model<a class="headerlink" href="#kalman-filter-model" title="Permanent link">#</a></h2>
 <h3 id="kinematics-model-in-update-function">kinematics model in update function<a class="headerlink" href="#kinematics-model-in-update-function" title="Permanent link">#</a></h3>
 <p><img src="./media/ekf_dynamics.png" width="320"></p>
-<p>where <code>b_k</code> is the yawbias.</p>
+<p>where, <span class="arithmatex">\(\theta_k\)</span> represents the vehicle's heading angle, including the mounting angle bias.
+<span class="arithmatex">\(b_k\)</span> is a correction term for the yaw bias, and it is modeled so that <span class="arithmatex">\((\theta_k+b_k)\)</span> becomes the heading angle of the base_link.
+The pose_estimator is expected to publish the base_link in the map coordinate system. However, the yaw angle may be offset due to calibration errors. This model compensates this error and improves estimation accuracy.</p>
 <h3 id="time-delay-model">time delay model<a class="headerlink" href="#time-delay-model" title="Permanent link">#</a></h3>
 <p>The measurement time delay is handled by an augmented state [1] (See, Section 7.3 FIXED-LAG SMOOTHING).</p>
 <p><img src="./media/delay_model_eq.png" width="320"></p>
@@ -15146,7 +15221,7 @@ Increasing the number will improve the smoothness of the estimation, but may hav
 </ul>
 <h2 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">#</a></h2>
 <ul>
-<li>In the presence of multiple inputs with yaw estimation, yaw bias <code>b_k</code> in the current EKF state would not make any sense, since it is intended to capture the extrinsic parameter's calibration error of a sensor. Thus, future work includes introducing yaw bias for each sensor with yaw estimation.</li>
+<li>If multiple pose_estimators are used, the input to the EKF will include multiple yaw biases corresponding to each source. However, the current EKF assumes the existence of only one yaw bias. Therefore, yaw bias <code>b_k</code> in the current EKF state would not make any sense and cannot correctly handle these multiple yaw biases. Thus, future work includes introducing yaw bias for each sensor with yaw estimation.</li>
 </ul>
 <h2 id="reference">reference<a class="headerlink" href="#reference" title="Permanent link">#</a></h2>
 <p>[1] Anderson, B. D. O., &amp; Moore, J. B. (1979). Optimal filtering. Englewood Cliffs, NJ: Prentice-Hall.</p></div>

@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14707,7 +14739,7 @@
 </li>
 </ul>
 <h3 id="tuning-lane-change-detection-logic">Tuning lane change detection logic<a class="headerlink" href="#tuning-lane-change-detection-logic" title="Permanent link">#</a></h3>
-<p>Currently we provide two parameters to tune lane change detection:</p>
+<p>Currently we provide three parameters to tune lane change detection:</p>
 <ul>
 <li><code>dist_threshold_to_bound_</code>: maximum distance from lane boundary allowed for lane changing vehicle</li>
 <li><code>time_threshold_to_bound_</code>: maximum time allowed for lane change vehicle to reach the boundary</li>
@@ -14781,6 +14813,37 @@ t_{predicted} = \dfrac{d_{lat}}{v_{lat}}
 <p>See paper [2] for more details.</p>
 <h4 id="tuning-lateral-path-shape">Tuning lateral path shape<a class="headerlink" href="#tuning-lateral-path-shape" title="Permanent link">#</a></h4>
 <p><code>lateral_control_time_horizon</code> parameter supports the tuning of the lateral path shape. This parameter is used to calculate the time to reach the reference path. The smaller the value, the more the path will be generated to reach the reference path quickly. (Mostly the center of the lane.)</p>
+<h4 id="pruning-predicted-paths-with-lateral-acceleration-constraint">Pruning predicted paths with lateral acceleration constraint<a class="headerlink" href="#pruning-predicted-paths-with-lateral-acceleration-constraint" title="Permanent link">#</a></h4>
+<p>It is possible to apply a maximum lateral acceleration constraint to generated vehicle paths. This check verifies if it is possible for the vehicle to perform the predicted path without surpassing a lateral acceleration threshold <code>max_lateral_accel</code> when taking a curve. If it is not possible, it checks if the vehicle can slow down on time to take the curve with a deceleration of <code>min_acceleration_before_curve</code> and comply with the constraint. If that is also not possible, the path is eliminated.</p>
+<p>Currently we provide three parameters to tune the lateral acceleration constraint:</p>
+<ul>
+<li><code>check_lateral_acceleration_constraints_</code>: to enable the constraint check.</li>
+<li><code>max_lateral_accel_</code>: max acceptable lateral acceleration for predicted paths (absolute value).</li>
+<li><code>min_acceleration_before_curve_</code>: the minimum acceleration the vehicle would theoretically use to slow down before a curve is taken (must be negative).</li>
+</ul>
+<p>You can change these parameters in rosparam in the table below.</p>
+<table>
+<thead>
+<tr>
+<th>param name</th>
+<th>default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>check_lateral_acceleration_constraints_</code></td>
+<td><code>false</code> [bool]</td>
+</tr>
+<tr>
+<td><code>max_lateral_accel</code></td>
+<td><code>2.0</code> [m/s^2]</td>
+</tr>
+<tr>
+<td><code>min_acceleration_before_curve</code></td>
+<td><code>-2.0</code> [m/s^2]</td>
+</tr>
+</tbody>
+</table>
 <h3 id="path-prediction-for-crosswalk-users">Path prediction for crosswalk users<a class="headerlink" href="#path-prediction-for-crosswalk-users" title="Permanent link">#</a></h3>
 <p>This module treats <strong>Pedestrians</strong> and <strong>Bicycles</strong> as objects using the crosswalk, and outputs prediction path based on map and estimated object's velocity, assuming the object has intention to cross the crosswalk, if the objects satisfies at least one of the following conditions:</p>
 <ul>

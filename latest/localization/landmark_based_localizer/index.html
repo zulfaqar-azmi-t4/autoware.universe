@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../planning/behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../../planning/behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14538,19 +14570,6 @@
     Map specifications
   </a>
   
-    <nav class="md-nav" aria-label="Map specifications">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example-of-lanelet2_maposm" class="md-nav__link">
-    Example of lanelet2_map.osm
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -14629,60 +14648,7 @@ So, if the 4 vertices are considered as forming a tetrahedron and its volume exc
 <li>etc.</li>
 </ul>
 <h2 id="map-specifications">Map specifications<a class="headerlink" href="#map-specifications" title="Permanent link">#</a></h2>
-<p>For this package to work correctly, the poses of the landmarks must be specified in the Lanelet2 map format that <code>map_loader</code> and <code>landmark_manager</code> can interpret.</p>
-<p>The four vertices of a landmark are defined counterclockwise.</p>
-<p>The order of the four vertices is defined as follows. In the coordinate system of a landmark,</p>
-<ul>
-<li>the x-axis is parallel to the vector from the first vertex to the second vertex</li>
-<li>the y-axis is parallel to the vector from the second vertex to the third vertex</li>
-</ul>
-<p><img alt="lanelet2 data structure" src="doc_image/lanelet2_data_structure.drawio.svg"></p>
-<h3 id="example-of-lanelet2_maposm">Example of <code>lanelet2_map.osm</code><a class="headerlink" href="#example-of-lanelet2_maposm" title="Permanent link">#</a></h3>
-<p>The values provided below are placeholders.
-Ensure to input the correct coordinates corresponding to the actual location where the landmark is placed, such as <code>lat</code>, <code>lon</code>, <code>mgrs_code</code>, <code>local_x</code>, <code>local_y</code>.</p>
-<p>For example, when using the AR tag, it would look like this.</p>
-<div class="highlight"><pre><span></span><code>...
-
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">id=</span><span class="s">"1"</span><span class="w"> </span><span class="na">lat=</span><span class="s">"35.8xxxxx"</span><span class="w"> </span><span class="na">lon=</span><span class="s">"139.6xxxxx"</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"mgrs_code"</span><span class="w"> </span><span class="na">v=</span><span class="s">"99XXX000000"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_x"</span><span class="w"> </span><span class="na">v=</span><span class="s">"22.2356"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_y"</span><span class="w"> </span><span class="na">v=</span><span class="s">"87.4506"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"ele"</span><span class="w"> </span><span class="na">v=</span><span class="s">"2.1725"</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/node&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">id=</span><span class="s">"2"</span><span class="w"> </span><span class="na">lat=</span><span class="s">"35.8xxxxx"</span><span class="w"> </span><span class="na">lon=</span><span class="s">"139.6xxxxx"</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"mgrs_code"</span><span class="w"> </span><span class="na">v=</span><span class="s">"99XXX000000"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_x"</span><span class="w"> </span><span class="na">v=</span><span class="s">"22.639"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_y"</span><span class="w"> </span><span class="na">v=</span><span class="s">"87.5886"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"ele"</span><span class="w"> </span><span class="na">v=</span><span class="s">"2.5947"</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/node&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">id=</span><span class="s">"3"</span><span class="w"> </span><span class="na">lat=</span><span class="s">"35.8xxxxx"</span><span class="w"> </span><span class="na">lon=</span><span class="s">"139.6xxxxx"</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"mgrs_code"</span><span class="w"> </span><span class="na">v=</span><span class="s">"99XXX000000"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_x"</span><span class="w"> </span><span class="na">v=</span><span class="s">"22.2331"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_y"</span><span class="w"> </span><span class="na">v=</span><span class="s">"87.4713"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"ele"</span><span class="w"> </span><span class="na">v=</span><span class="s">"3.0208"</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/node&gt;</span>
-<span class="w">  </span><span class="nt">&lt;node</span><span class="w"> </span><span class="na">id=</span><span class="s">"4"</span><span class="w"> </span><span class="na">lat=</span><span class="s">"35.8xxxxx"</span><span class="w"> </span><span class="na">lon=</span><span class="s">"139.6xxxxx"</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"mgrs_code"</span><span class="w"> </span><span class="na">v=</span><span class="s">"99XXX000000"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_x"</span><span class="w"> </span><span class="na">v=</span><span class="s">"21.8298"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"local_y"</span><span class="w"> </span><span class="na">v=</span><span class="s">"87.3332"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"ele"</span><span class="w"> </span><span class="na">v=</span><span class="s">"2.5985"</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/node&gt;</span>
-
-...
-
-<span class="w">  </span><span class="nt">&lt;way</span><span class="w"> </span><span class="na">id=</span><span class="s">"5"</span><span class="nt">&gt;</span>
-<span class="w">    </span><span class="nt">&lt;nd</span><span class="w"> </span><span class="na">ref=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;nd</span><span class="w"> </span><span class="na">ref=</span><span class="s">"2"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;nd</span><span class="w"> </span><span class="na">ref=</span><span class="s">"3"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;nd</span><span class="w"> </span><span class="na">ref=</span><span class="s">"4"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"type"</span><span class="w"> </span><span class="na">v=</span><span class="s">"pose_marker"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"subtype"</span><span class="w"> </span><span class="na">v=</span><span class="s">"apriltag_16h5"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"area"</span><span class="w"> </span><span class="na">v=</span><span class="s">"yes"</span><span class="nt">/&gt;</span>
-<span class="w">    </span><span class="nt">&lt;tag</span><span class="w"> </span><span class="na">k=</span><span class="s">"marker_id"</span><span class="w"> </span><span class="na">v=</span><span class="s">"0"</span><span class="nt">/&gt;</span>
-<span class="w">  </span><span class="nt">&lt;/way&gt;</span>
-
-...
-</code></pre></div>
+<p>See <a href="https://github.com/autowarefoundation/autoware_common/blob/main/tmp/lanelet2_extension/docs/lanelet2_format_extension.md#localization-landmarks">https://github.com/autowarefoundation/autoware_common/blob/main/tmp/lanelet2_extension/docs/lanelet2_format_extension.md#localization-landmarks</a></p>
 <h2 id="about-consider_orientation">About <code>consider_orientation</code><a class="headerlink" href="#about-consider_orientation" title="Permanent link">#</a></h2>
 <p>The <code>calculate_new_self_pose</code> function in the <code>LandmarkManager</code> class includes a boolean argument named <code>consider_orientation</code>. This argument determines the method used to calculate the new self pose based on detected and mapped landmarks. The following image illustrates the difference between the two methods.</p>
 <p><img alt="consider_orientation_figure" src="doc_image/consider_orientation.drawio.svg"></p>

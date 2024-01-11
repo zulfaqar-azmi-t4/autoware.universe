@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://autowarefoundation.github.io/autoware.universe/latest/planning/behavior_path_lane_change_module/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../behavior_path_goal_planner_module/">
       
       
         <link rel="next" href="../behavior_path_planner/">
@@ -7746,6 +7746,8 @@
         
           
         
+          
+        
       
       
         <label class="md-nav__link" for="__nav_7_13_2" id="__nav_7_13_2_label" tabindex="0">
@@ -7810,6 +7812,20 @@
     <li class="md-nav__item">
       <a href="../../perception/image_projection_based_fusion/docs/roi-pointcloud-fusion/" class="md-nav__link">
         roi_pointcloud_fusion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/image_projection_based_fusion/docs/segmentation-pointcloud-fusion/" class="md-nav__link">
+        segmentation_pointcloud_fusion
       </a>
     </li>
   
@@ -8497,6 +8513,8 @@
         
           
         
+          
+        
       
       
         
@@ -8541,6 +8559,20 @@
     <li class="md-nav__item">
       <a href="../../perception/probabilistic_occupancy_grid_map/pointcloud-based-occupancy-grid-map/" class="md-nav__link">
         pointcloud based occupancy grid map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perception/probabilistic_occupancy_grid_map/synchronized_grid_map_fusion/" class="md-nav__link">
+        synchronized OGM fusion
       </a>
     </li>
   
@@ -9749,7 +9781,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
+      <a href="../behavior_path_planner_common/docs/behavior_path_planner_path_generation_design" class="md-nav__link">
         Path Generation
       </a>
     </li>
@@ -9763,7 +9795,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_safety_check" class="md-nav__link">
+      <a href="../behavior_path_planner_common/docs/behavior_path_planner_safety_check" class="md-nav__link">
         Collision Assessment/Safety Check
       </a>
     </li>
@@ -9777,7 +9809,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
+      <a href="../behavior_path_planner_common/docs/behavior_path_planner_drivable_area_design" class="md-nav__link">
         Dynamic Drivable Area
       </a>
     </li>
@@ -9791,7 +9823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
+      <a href="../behavior_path_planner_common/docs/behavior_path_planner_turn_signal_design" class="md-nav__link">
         Turn Signal
       </a>
     </li>
@@ -9857,7 +9889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_avoidance_design" class="md-nav__link">
+      <a href="../behavior_path_avoidance_module" class="md-nav__link">
         Avoidance
       </a>
     </li>
@@ -9871,7 +9903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_avoidance_by_lane_change_design" class="md-nav__link">
+      <a href="../behavior_path_avoidance_by_lane_change_module" class="md-nav__link">
         Avoidance by Lane Change
       </a>
     </li>
@@ -9885,7 +9917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_dynamic_avoidance_design" class="md-nav__link">
+      <a href="../behavior_path_dynamic_avoidance_module" class="md-nav__link">
         Dynamic Avoidance
       </a>
     </li>
@@ -9899,7 +9931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_goal_planner_design" class="md-nav__link">
+      <a href="../behavior_path_goal_planner_module" class="md-nav__link">
         Goal Planner
       </a>
     </li>
@@ -9927,7 +9959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_side_shift_design" class="md-nav__link">
+      <a href="../behavior_path_side_shift_module" class="md-nav__link">
         Side Shift
       </a>
     </li>
@@ -9941,7 +9973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../behavior_path_planner/docs/behavior_path_planner_start_planner_design" class="md-nav__link">
+      <a href="../behavior_path_start_planner_module" class="md-nav__link">
         Start Planner
       </a>
     </li>
@@ -14735,11 +14767,11 @@ Computing candidate paths that assumes ego vehicle's slows down is performed by 
 <p>The following flow chart illustrates the validity check.</p>
 <p><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXMtYXNjaWkiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBjb250ZW50U3R5bGVUeXBlPSJ0ZXh0L2NzcyIgaGVpZ2h0PSI5NTlweCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIgc3R5bGU9IndpZHRoOjY4M3B4O2hlaWdodDo5NTlweDtiYWNrZ3JvdW5kOiNGRkZGRkY7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA2ODMgOTU5IiB3aWR0aD0iNjgzcHgiIHpvb21BbmRQYW49Im1hZ25pZnkiPjxkZWZzLz48Zz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iMjYwIiB4PSIyMTAuMjUiIHk9IjMyLjk5NTEiPlNlbGVjdGluZyBWYWxpZCBDYW5kaWRhdGUgUGF0aHM8L3RleHQ+PGVsbGlwc2UgY3g9IjM0MC41IiBjeT0iNTcuMjk2OSIgZmlsbD0iIzIyMjIyMiIgcng9IjEwIiByeT0iMTAiIHN0eWxlPSJzdHJva2U6IzIyMjIyMjtzdHJva2Utd2lkdGg6MS4wOyIvPjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSIzMjEiIHg9IjE4MCIgeT0iODcuMjk2OSIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI0MiIgeD0iMTkwIiB5PSIxMDguNDM1NSI+SU5QVVQ8L3RleHQ+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iMjU1IiB4PSIyMzYiIHk9IjEwOC40MzU1Ij5zdGQ6OnZlY3RvciZsdDtMYW5lQ2hhbmdlUGF0aCZndDsgaW5wdXRfcGF0aHM8L3RleHQ+PHJlY3QgZmlsbD0ibm9uZSIgaGVpZ2h0PSI3NzUuNTI3OCIgc3R5bGU9InN0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoxLjU7IiB3aWR0aD0iNjYxLjUiIHg9IjExIiB5PSIxMzEuMjY1NiIvPjxwYXRoIGQ9Ik0xNDAsMTMxLjI2NTYgTDE0MCwxNDAuNTYyNSBMMTMwLDE1MC41NjI1IEwxMSwxNTAuNTYyNSAiIGZpbGw9Im5vbmUiIHN0eWxlPSJzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MS41OyIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjExOSIgeD0iMTQiIHk9IjE0NS4yNjA3Ij5zZWxlY3RWYWxpZFBhdGhzPC90ZXh0PjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSIzNDgiIHg9IjE2Ni41IiB5PSIxNjcuNTYyNSIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI3MCIgeD0iMTc2LjUiIHk9IjE4OC43MDEyIj5JTklUSUFMSVpFPC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjI1NCIgeD0iMjUwLjUiIHk9IjE4OC43MDEyIj5zdGQ6OnZlY3RvciZsdDtMYW5lQ2hhbmdlUGF0aCZndDsgdmFsaWRfcGF0aHM8L3RleHQ+PHJlY3QgZmlsbD0iI0YxRjFGMSIgaGVpZ2h0PSIzMy45Njg4IiByeD0iMTIuNSIgcnk9IjEyLjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIgd2lkdGg9IjY0IiB4PSIzMDguNSIgeT0iMjIxLjUzMTMiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI0NCIgeD0iMzE4LjUiIHk9IjI0Mi42Njk5Ij5pZHggPSAwPC90ZXh0PjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSIxNzQiIHg9IjI1My41IiB5PSIzMTkuNSIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjE1NCIgeD0iMjYzLjUiIHk9IjM0MC42Mzg3Ij5wYXRoID0gaW5wdXRfcGF0aHMuYXQoaWR4KTwvdGV4dD48cmVjdCBmaWxsPSJub25lIiBoZWlnaHQ9IjI1MC4zMTI1IiBzdHlsZT0ic3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjEuNTsiIHdpZHRoPSI2MDUuNSIgeD0iMzkiIHk9IjM2My40Njg4Ii8+PHBhdGggZD0iTTE4OSwzNjMuNDY4OCBMMTg5LDM3Mi43NjU2IEwxNzksMzgyLjc2NTYgTDM5LDM4Mi43NjU2ICIgZmlsbD0ibm9uZSIgc3R5bGU9InN0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoxLjU7Ii8+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iMTQwIiB4PSI0MiIgeT0iMzc3LjQ2MzkiPmhhc0Vub3VnaERpc3RhbmNlPC90ZXh0Pjxwb2x5Z29uIGZpbGw9IiNGMUYxRjEiIHBvaW50cz0iMTQzLDM5OS43NjU2LDUzOCwzOTkuNzY1Niw1NTAsNDYzLjc4OTEsNTM4LDUyNy44MTI1LDE0Myw1MjcuODEyNSwxMzEsNDYzLjc4OTEsMTQzLDM5OS43NjU2IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIzNTgiIHg9IjE2MS41IiB5PSI0MDkuOTc2MSI+bGFuZV9jaGFuZ2VfdG90YWxfZGlzdGFuY2UgJmx0OyBkaXN0YW5jZSB0byBlbmQgb2YgY3VycmVudCBsYW5lczwvdGV4dD48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxOCIgeD0iMzMxLjUiIHk9IjQyMi43ODA4Ij4mYW1wOyZhbXA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjM2MiIgeD0iMTU5LjUiIHk9IjQzNS41ODU0Ij5sYW5lX2NoYW5nZV90b3RhbF9kaXN0YW5jZSAmbHQ7IGRpc3RhbmNlIHRvIHRoZSBuZXh0IGludGVyc2VjdGlvbjwvdGV4dD48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxOCIgeD0iMzMxLjUiIHk9IjQ0OC4zOTAxIj4mYW1wOyZhbXA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjM5NSIgeD0iMTQzIiB5PSI0NjEuMTk0OCI+bGFuZV9jaGFuZ2VfdG90YWxfZGlzdGFuY2UgJmx0OyBkaXN0YW5jZSBmcm9tIGN1cnJlbnQgcG9zZSB0byB0aGUgZ29hbDwvdGV4dD48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxOCIgeD0iMzMxLjUiIHk9IjQ3My45OTk1Ij4mYW1wOyZhbXA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjI5NiIgeD0iMTkyLjUiIHk9IjQ4Ni44MDQyIj5sYW5lX2NoYW5nZV90b3RhbF9kaXN0YW5jZSAmbHQ7IGRpc3RhbmNlIHRvIGNyb3Nzd2FsazwvdGV4dD48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxOCIgeD0iMzMxLjUiIHk9IjQ5OS42MDg5Ij4mYW1wOyZhbXA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9Ijg1IiB4PSIyOTgiIHk9IjUxMi40MTM2Ij5nb2FsIGlzIGluIHJvdXRlPC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjQiIHg9IjMzOC41IiB5PSI1MjUuMjE4MyI+JiMxNjA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjIzIiB4PSIxMDgiIHk9IjQ2MS4xOTQ4Ij50cnVlPC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjQiIHg9IjU1MCIgeT0iNDQ4LjM5MDEiPiYjMTYwOzwvdGV4dD48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIyOCIgeD0iNTU0IiB5PSI0NjEuMTk0OCI+ZmFsc2U8L3RleHQ+PHJlY3QgZmlsbD0iI0YxRjFGMSIgaGVpZ2h0PSIzMy45Njg4IiByeD0iMTIuNSIgcnk9IjEyLjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIgd2lkdGg9IjE0MCIgeD0iNTEiIHk9IjUzNy44MTI1Ii8+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iMTIwIiB4PSI2MSIgeT0iNTU4Ljk1MTIiPnBhdGhfdmFsaWRpdHkgID0gdHJ1ZTwvdGV4dD48cmVjdCBmaWxsPSIjRjFGMUYxIiBoZWlnaHQ9IjMzLjk2ODgiIHJ4PSIxMi41IiByeT0iMTIuNSIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDowLjU7IiB3aWR0aD0iMTQ1IiB4PSI0ODcuNSIgeT0iNTM3LjgxMjUiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxMjUiIHg9IjQ5Ny41IiB5PSI1NTguOTUxMiI+cGF0aF92YWxpZGl0eSAgPSBmYWxzZTwvdGV4dD48cG9seWdvbiBmaWxsPSIjRjFGMUYxIiBwb2ludHM9IjM0MC41LDU3Ny43ODEzLDM1Mi41LDU4OS43ODEzLDM0MC41LDYwMS43ODEzLDMyOC41LDU4OS43ODEzLDM0MC41LDU3Ny43ODEzIiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiLz48cmVjdCBmaWxsPSIjRjFGMUYxIiBoZWlnaHQ9IjMzLjk2ODgiIHJ4PSIxMi41IiByeT0iMTIuNSIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDowLjU7IiB3aWR0aD0iMTkwIiB4PSIyNDUuNSIgeT0iNjg2Ljg4NzIiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIxNzAiIHg9IjI1NS41IiB5PSI3MDguMDI1OSI+dmFsaWRfcGF0aHMucHVzaF9iYWNrKHBhdGgpPC90ZXh0Pjxwb2x5Z29uIGZpbGw9IiNGMUYxRjEiIHBvaW50cz0iMjgwLDYzOC40ODQ5LDQwMSw2MzguNDg0OSw0MTMsNjUwLjQ4NDksNDAxLDY2Mi40ODQ5LDI4MCw2NjIuNDg0OSwyNjgsNjUwLjQ4NDksMjgwLDYzOC40ODQ5IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiLz48dGV4dCBmaWxsPSIjMDAwMDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMSIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSIyMyIgeD0iMzQ0LjUiIHk9IjY3Mi42OTUzIj50cnVlPC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjEyMSIgeD0iMjgwIiB5PSI2NTQuMjkzIj5wYXRoX3ZhbGlkaXR5ID09IHRydWU8L3RleHQ+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iNCIgeD0iNDEzIiB5PSI2MzUuMDg1OSI+JiMxNjA7PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjI4IiB4PSI0MTMiIHk9IjY0Ny44OTA2Ij5mYWxzZTwvdGV4dD48cG9seWdvbiBmaWxsPSIjRjFGMUYxIiBwb2ludHM9IjM0MC41LDc0MC44NTYsMzUyLjUsNzUyLjg1NiwzNDAuNSw3NjQuODU2LDMyOC41LDc1Mi44NTYsMzQwLjUsNzQwLjg1NiIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDowLjU7Ii8+PHJlY3QgZmlsbD0iI0YxRjFGMSIgaGVpZ2h0PSIzMy45Njg4IiByeD0iMTIuNSIgcnk9IjEyLjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIgd2lkdGg9IjU4IiB4PSIzMTEuNSIgeT0iNzg0Ljg1NiIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjM4IiB4PSIzMjEuNSIgeT0iODA1Ljk5NDYiPisraWR4PC90ZXh0Pjxwb2x5Z29uIGZpbGw9IiNGMUYxRjEiIHBvaW50cz0iMjcwLjUsMjc1LjUsNDEwLjUsMjc1LjUsNDIyLjUsMjg3LjUsNDEwLjUsMjk5LjUsMjcwLjUsMjk5LjUsMjU4LjUsMjg3LjUsMjcwLjUsMjc1LjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MC41OyIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjE0MCIgeD0iMjcwLjUiIHk9IjI5MS4zMDgxIj5pZHggJmx0OyBpbnB1dF9wYXRocy5zaXplKCk/PC90ZXh0Pjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBsZW5ndGhBZGp1c3Q9InNwYWNpbmciIHRleHRMZW5ndGg9IjI4IiB4PSIyMzAuNSIgeT0iMjg0LjkwNTgiPmZhbHNlPC90ZXh0PjxyZWN0IGZpbGw9IiNGMUYxRjEiIGhlaWdodD0iMzMuOTY4OCIgcng9IjEyLjUiIHJ5PSIxMi41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjAuNTsiIHdpZHRoPSIxNDYiIHg9IjI2Ny41IiB5PSI4NjAuODI0NyIvPjx0ZXh0IGZpbGw9IiMwMDAwMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCIgbGVuZ3RoQWRqdXN0PSJzcGFjaW5nIiB0ZXh0TGVuZ3RoPSI1NSIgeD0iMjc3LjUiIHk9Ijg4MS45NjM0Ij5SRVRVUk48L3RleHQ+PHRleHQgZmlsbD0iIzAwMDAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGxlbmd0aEFkanVzdD0ic3BhY2luZyIgdGV4dExlbmd0aD0iNjciIHg9IjMzNi41IiB5PSI4ODEuOTYzNCI+dmFsaWRfcGF0aHM8L3RleHQ+PGVsbGlwc2UgY3g9IjM0MC41IiBjeT0iOTM3Ljc5MzUiIGZpbGw9Im5vbmUiIHJ4PSIxMSIgcnk9IjExIiBzdHlsZT0ic3Ryb2tlOiMyMjIyMjI7c3Ryb2tlLXdpZHRoOjEuMDsiLz48ZWxsaXBzZSBjeD0iMzQwLjUiIGN5PSI5MzcuNzkzNSIgZmlsbD0iIzIyMjIyMiIgcng9IjYiIHJ5PSI2IiBzdHlsZT0ic3Ryb2tlOiMyMjIyMjI7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIzNDAuNSIgeDI9IjM0MC41IiB5MT0iNjcuMjk2OSIgeTI9Ijg3LjI5NjkiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjMzNi41LDc3LjI5NjksMzQwLjUsODcuMjk2OSwzNDQuNSw3Ny4yOTY5LDM0MC41LDgxLjI5NjkiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iMzQwLjUiIHkxPSIyMDEuNTMxMyIgeTI9IjIyMS41MzEzIi8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIzMzYuNSwyMTEuNTMxMywzNDAuNSwyMjEuNTMxMywzNDQuNSwyMTEuNTMxMywzNDAuNSwyMTUuNTMxMyIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMTMxIiB4Mj0iMTIxIiB5MT0iNDYzLjc4OTEiIHkyPSI0NjMuNzg5MSIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjEyMSIgeDI9IjEyMSIgeTE9IjQ2My43ODkxIiB5Mj0iNTM3LjgxMjUiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjExNyw1MjcuODEyNSwxMjEsNTM3LjgxMjUsMTI1LDUyNy44MTI1LDEyMSw1MzEuODEyNSIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iNTUwIiB4Mj0iNTYwIiB5MT0iNDYzLjc4OTEiIHkyPSI0NjMuNzg5MSIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjU2MCIgeDI9IjU2MCIgeTE9IjQ2My43ODkxIiB5Mj0iNTM3LjgxMjUiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjU1Niw1MjcuODEyNSw1NjAsNTM3LjgxMjUsNTY0LDUyNy44MTI1LDU2MCw1MzEuODEyNSIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMTIxIiB4Mj0iMTIxIiB5MT0iNTcxLjc4MTMiIHkyPSI1ODkuNzgxMyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjEyMSIgeDI9IjMyOC41IiB5MT0iNTg5Ljc4MTMiIHkyPSI1ODkuNzgxMyIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzE4LjUsNTg1Ljc4MTMsMzI4LjUsNTg5Ljc4MTMsMzE4LjUsNTkzLjc4MTMsMzIyLjUsNTg5Ljc4MTMiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjU2MCIgeDI9IjU2MCIgeTE9IjU3MS43ODEzIiB5Mj0iNTg5Ljc4MTMiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSI1NjAiIHgyPSIzNTIuNSIgeTE9IjU4OS43ODEzIiB5Mj0iNTg5Ljc4MTMiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjM2Mi41LDU4NS43ODEzLDM1Mi41LDU4OS43ODEzLDM2Mi41LDU5My43ODEzLDM1OC41LDU4OS43ODEzIiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIzNDAuNSIgeDI9IjM0MC41IiB5MT0iMzUzLjQ2ODgiIHkyPSIzOTkuNzY1NiIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzM2LjUsMzg5Ljc2NTYsMzQwLjUsMzk5Ljc2NTYsMzQ0LjUsMzg5Ljc2NTYsMzQwLjUsMzkzLjc2NTYiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iMzQwLjUiIHkxPSI2NjIuNDg0OSIgeTI9IjY4Ni44ODcyIi8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIzMzYuNSw2NzYuODg3MiwzNDAuNSw2ODYuODg3MiwzNDQuNSw2NzYuODg3MiwzNDAuNSw2ODAuODg3MiIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iNDEzIiB4Mj0iNDQ1LjUiIHkxPSI2NTAuNDg0OSIgeTI9IjY1MC40ODQ5Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSI0NDEuNSw2OTMuODcxNiw0NDUuNSw3MDMuODcxNiw0NDkuNSw2OTMuODcxNiw0NDUuNSw2OTcuODcxNiIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iNDQ1LjUiIHgyPSI0NDUuNSIgeTE9IjY1MC40ODQ5IiB5Mj0iNzUyLjg1NiIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjQ0NS41IiB4Mj0iMzUyLjUiIHkxPSI3NTIuODU2IiB5Mj0iNzUyLjg1NiIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzYyLjUsNzQ4Ljg1NiwzNTIuNSw3NTIuODU2LDM2Mi41LDc1Ni44NTYsMzU4LjUsNzUyLjg1NiIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMzQwLjUiIHgyPSIzNDAuNSIgeTE9IjcyMC44NTYiIHkyPSI3NDAuODU2Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIzMzYuNSw3MzAuODU2LDM0MC41LDc0MC44NTYsMzQ0LjUsNzMwLjg1NiwzNDAuNSw3MzQuODU2IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIzNDAuNSIgeDI9IjM0MC41IiB5MT0iNjAxLjc4MTMiIHkyPSI2MzguNDg0OSIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzM2LjUsNjI4LjQ4NDksMzQwLjUsNjM4LjQ4NDksMzQ0LjUsNjI4LjQ4NDksMzQwLjUsNjMyLjQ4NDkiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iMzQwLjUiIHkxPSI3NjQuODU2IiB5Mj0iNzg0Ljg1NiIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzM2LjUsNzc0Ljg1NiwzNDAuNSw3ODQuODU2LDM0NC41LDc3NC44NTYsMzQwLjUsNzc4Ljg1NiIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMzQwLjUiIHgyPSIzNDAuNSIgeTE9IjI5OS41IiB5Mj0iMzE5LjUiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjMzNi41LDMwOS41LDM0MC41LDMxOS41LDM0NC41LDMwOS41LDM0MC41LDMxMy41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIzNDAuNSIgeDI9IjM0MC41IiB5MT0iODE4LjgyNDciIHkyPSI4MjguODI0NyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iNjU2LjUiIHkxPSI4MjguODI0NyIgeTI9IjgyOC44MjQ3Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSI2NTIuNSw1NzMuNTExNyw2NTYuNSw1NjMuNTExNyw2NjAuNSw1NzMuNTExNyw2NTYuNSw1NjkuNTExNyIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iNjU2LjUiIHgyPSI2NTYuNSIgeTE9IjI4Ny41IiB5Mj0iODI4LjgyNDciLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSI2NTYuNSIgeDI9IjQyMi41IiB5MT0iMjg3LjUiIHkyPSIyODcuNSIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iNDMyLjUsMjgzLjUsNDIyLjUsMjg3LjUsNDMyLjUsMjkxLjUsNDI4LjUsMjg3LjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjI1OC41IiB4Mj0iMjciIHkxPSIyODcuNSIgeTI9IjI4Ny41Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIyMyw1NTkuNTExNywyNyw1NjkuNTExNywzMSw1NTkuNTExNywyNyw1NjMuNTExNyIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMjciIHgyPSIyNyIgeTE9IjI4Ny41IiB5Mj0iODQwLjgyNDciLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIyNyIgeDI9IjM0MC41IiB5MT0iODQwLjgyNDciIHkyPSI4NDAuODI0NyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iMzQwLjUiIHkxPSI4NDAuODI0NyIgeTI9Ijg2MC44MjQ3Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIzMzYuNSw4NTAuODI0NywzNDAuNSw4NjAuODI0NywzNDQuNSw4NTAuODI0NywzNDAuNSw4NTQuODI0NyIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PGxpbmUgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7IiB4MT0iMzQwLjUiIHgyPSIzNDAuNSIgeTE9IjI1NS41IiB5Mj0iMjc1LjUiLz48cG9seWdvbiBmaWxsPSIjMTgxODE4IiBwb2ludHM9IjMzNi41LDI2NS41LDM0MC41LDI3NS41LDM0NC41LDI2NS41LDM0MC41LDI2OS41IiBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiLz48bGluZSBzdHlsZT0ic3Ryb2tlOiMxODE4MTg7c3Ryb2tlLXdpZHRoOjEuMDsiIHgxPSIzNDAuNSIgeDI9IjM0MC41IiB5MT0iMTIxLjI2NTYiIHkyPSIxNjcuNTYyNSIvPjxwb2x5Z29uIGZpbGw9IiMxODE4MTgiIHBvaW50cz0iMzM2LjUsMTU3LjU2MjUsMzQwLjUsMTY3LjU2MjUsMzQ0LjUsMTU3LjU2MjUsMzQwLjUsMTYxLjU2MjUiIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIvPjxsaW5lIHN0eWxlPSJzdHJva2U6IzE4MTgxODtzdHJva2Utd2lkdGg6MS4wOyIgeDE9IjM0MC41IiB4Mj0iMzQwLjUiIHkxPSI4OTQuNzkzNSIgeTI9IjkyNi43OTM1Ii8+PHBvbHlnb24gZmlsbD0iIzE4MTgxOCIgcG9pbnRzPSIzMzYuNSw5MTYuNzkzNSwzNDAuNSw5MjYuNzkzNSwzNDQuNSw5MTYuNzkzNSwzNDAuNSw5MjAuNzkzNSIgc3R5bGU9InN0cm9rZTojMTgxODE4O3N0cm9rZS13aWR0aDoxLjA7Ii8+PCEtLVNSQz1bYkw5UkktbW00N3hGaHZXZFFMU0dkLWxnR05HVjVhSDRMbl9hRzFkUlFIaXNjdkhhd2tLU19FekVpY2xmV2cyLWI5M3ZSaXJ5T1FyalpudXRpNzdNTFBydDZtQnMwd2FtSmNmZ1MzMnllYlMtRHhncjZ4OENiTnA4SnIzTUNVcjMzM01pNTZpczE3VGFnNjlqTXRYMGVza3VHNWxoNmZkVzFoYUJBWjF3TGlMaWpoby1rTF9EUFgydUJlZmR1SldfbHE5QjVudFFiWUJ1M0NIb3VCQUZuMUVibjV1eWpCQ0dhYWFvSUFobVZ3a3VOMnRGaHZRRllzemFkb0RuYjJycV9HZ2RTMnA3YnF4QkJzSm5PWnVyRm1odzdzTnZkcnBHeUtCV3FvYm9mRUh4NEppQzItazZqaGxLeWlrczhpY2VUOUNQb0w5TUFLcDlaajZLeklUVzNrRUg3UDJqbUpMRzNUd2REblBVSzBTN3dpUzJ0MTVPc1BENGJHTTZrMUxkVnd4R0k0RDZ6enc1S1JEclE3dUxmRjhrWDFTcXd5WUFSRDExR2U1dDB2RkFld1k1QjdPbnRwdmxjSFFhLUd0YWVVRnpZSThaMFJBXzVYZ0txclV1RDEyV3JBckh4LWNqenA2ZE13cnlRZ1VBSUhVRS1ZNXF2SERNd3lJQy1fb3F0UmJrbk9sM0dyYnRpamVMUFpVRTlSblRoRXZsaHdNMC1vTHhiLUF4X1dDMF0tLT48L2c+PC9zdmc+" class="uml" alt="uml diagram" title=""></p>
 <h4 id="candidate-paths-safety-check">Candidate Path's Safety check<a class="headerlink" href="#candidate-paths-safety-check" title="Permanent link">#</a></h4>
-<p>See <a href="../behavior_path_planner/docs/behavior_path_planner_safety_check/">safety check utils explanation</a></p>
+<p>See <a href="../behavior_path_planner_common/docs/behavior_path_planner_safety_check/">safety check utils explanation</a></p>
 <h4 id="objects-selection-and-classification">Objects selection and classification<a class="headerlink" href="#objects-selection-and-classification" title="Permanent link">#</a></h4>
 <p>First, we divide the target objects into obstacles in the target lane, obstacles in the current lane, and obstacles in other lanes. Target lane indicates the lane that the ego vehicle is going to reach after the lane change and current lane mean the current lane where the ego vehicle is following before the lane change. Other lanes are lanes that do not belong to the target and current lanes. The following picture describes objects on each lane. Note that users can remove objects either on current and other lanes from safety check by changing the flag, which are <code>check_objects_on_current_lanes</code> and <code>check_objects_on_other_lanes</code>.</p>
 <p><img alt="object lanes" src="images/lane_objects.drawio.svg"></p>
-<p>Furthermore, to change lanes behind a vehicle waiting at a traffic light, we skip the safety check for the stopping vehicles near the traffic light.　The explanation for parked car detection is written in <a href="../behavior_path_planner/docs/behavior_path_planner_avoidance_design/">documentation for avoidance module</a>.</p>
+<p>Furthermore, to change lanes behind a vehicle waiting at a traffic light, we skip the safety check for the stopping vehicles near the traffic light.　The explanation for parked car detection is written in <a href="../behavior_path_avoidance_module/">documentation for avoidance module</a>.</p>
 <h5 id="collision-check-in-prepare-phase">Collision check in prepare phase<a class="headerlink" href="#collision-check-in-prepare-phase" title="Permanent link">#</a></h5>
 <p>The ego vehicle may need to secure ample inter-vehicle distance ahead of the target vehicle before attempting a lane change. The flag <code>enable_collision_check_at_prepare_phase</code> can be enabled to gain this behavior. The following image illustrates the differences between the <code>false</code> and <code>true</code> cases.</p>
 <p><img alt="enable collision check at prepare phase" src="images/lane_change-enable_collision_check_at_prepare_phase.png"></p>
@@ -15465,7 +15497,7 @@ If the ego vehicle velocity is smaller than <code>stuck_detection.velocity</code
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Planning Components" rel="prev">
+          <a href="../behavior_path_goal_planner_module/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Goal Planner design" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -15474,7 +15506,7 @@ If the ego vehicle velocity is smaller than <code>stuck_detection.velocity</code
                 Previous
               </span>
               <div class="md-ellipsis">
-                Planning Components
+                Goal Planner design
               </div>
             </div>
           </a>
