@@ -64,8 +64,10 @@ void LaneChangeModuleManager::init(rclcpp::Node * node)
   p.max_longitudinal_acc = getOrDeclareParameter<double>(*node, parameter("max_longitudinal_acc"));
 
   // collision check
-  p.enable_prepare_segment_collision_check =
-    getOrDeclareParameter<bool>(*node, parameter("enable_prepare_segment_collision_check"));
+  p.enable_prepare_segment_collision_check_in_general_areas = getOrDeclareParameter<bool>(
+    *node, parameter("enable_prepare_segment_collision_check.general_areas"));
+  p.enable_prepare_segment_collision_check_in_intersection = getOrDeclareParameter<bool>(
+    *node, parameter("enable_prepare_segment_collision_check.intersection"));
   p.prepare_segment_ignore_object_velocity_thresh = getOrDeclareParameter<double>(
     *node, parameter("prepare_segment_ignore_object_velocity_thresh"));
   p.check_objects_on_current_lanes =
