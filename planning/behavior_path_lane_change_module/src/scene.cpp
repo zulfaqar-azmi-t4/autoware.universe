@@ -1887,7 +1887,7 @@ bool NormalLaneChange::check_prepare_phase() const
   const auto & vehicle_info = getCommonParam().vehicle_info;
 
   const auto check_prepare_phase_in_intersection = std::invoke([&]() {
-    if (!lane_change_parameters_->enable_prepare_segment_collision_check_in_intersection) {
+    if (!lane_change_parameters_->enable_collision_check_for_prepare_phase_in_intersection) {
       return false;
     }
 
@@ -1903,7 +1903,7 @@ bool NormalLaneChange::check_prepare_phase() const
   });
 
   return check_prepare_phase_in_intersection ||
-         lane_change_parameters_->enable_prepare_segment_collision_check_in_general_areas;
+         lane_change_parameters_->enable_collision_check_for_prepare_phase_in_general_lanes;
 }
 
 }  // namespace behavior_path_planner
