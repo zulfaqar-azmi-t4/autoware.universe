@@ -802,10 +802,11 @@ LaneChangeTargetObjects NormalLaneChange::getTargetObjects(
   target_objects.other_lane.reserve(target_obj_index.other_lane.size());
 
   // objects in current lane
+  const auto is_check_prepare_phase = check_prepare_phase();
   for (const auto & obj_idx : target_obj_index.current_lane) {
     const auto extended_object = utils::lane_change::transform(
       objects.objects.at(obj_idx), common_parameters, *lane_change_parameters_,
-      check_prepare_phase());
+      is_check_prepare_phase);
     target_objects.current_lane.push_back(extended_object);
   }
 
@@ -813,7 +814,7 @@ LaneChangeTargetObjects NormalLaneChange::getTargetObjects(
   for (const auto & obj_idx : target_obj_index.target_lane) {
     const auto extended_object = utils::lane_change::transform(
       objects.objects.at(obj_idx), common_parameters, *lane_change_parameters_,
-      check_prepare_phase());
+      is_check_prepare_phase);
     target_objects.target_lane.push_back(extended_object);
   }
 
@@ -821,7 +822,7 @@ LaneChangeTargetObjects NormalLaneChange::getTargetObjects(
   for (const auto & obj_idx : target_obj_index.other_lane) {
     const auto extended_object = utils::lane_change::transform(
       objects.objects.at(obj_idx), common_parameters, *lane_change_parameters_,
-      check_prepare_phase());
+      is_check_prepare_phase);
     target_objects.other_lane.push_back(extended_object);
   }
 
