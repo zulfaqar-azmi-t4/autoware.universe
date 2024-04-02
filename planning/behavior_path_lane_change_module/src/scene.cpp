@@ -1742,6 +1742,7 @@ PathSafetyStatus NormalLaneChange::isLaneChangePathSafe(
       if (collided_polygons.empty()) {
         utils::path_safety_checker::updateCollisionCheckDebugMap(
           debug_data, current_debug_data, is_safe);
+        RCLCPP_DEBUG(logger_, "no collided polygons");
         continue;
       }
 
@@ -1903,7 +1904,30 @@ bool NormalLaneChange::check_prepare_phase() const
     return utils::lane_change::isWithinIntersection(getRouteHandler(), current_lane, ego_footprint);
   });
 
-  return check_prepare_phase_in_intersection ||
+  const auto check_prepare_phase_at_turns = std::invoke([&]() {
+    // if (!lane_change_parameters_->enable_collision_check_for_prepare_phase_in_intersection) {
+    //   return false;
+    // }
+
+    lanelet::ConstLanelet current_lane;
+    if (!route_handler->getClosestLaneletWithinRoute(getEgoPose(), &current_lane)) {
+      RCLCPP_DEBUG(logger_, "unable to get current lane");
+      return false;
+    }
+
+    const auto ego_footprint =
+      utils::lane_change::getEgoCurrentFootprint(getEgoPose(), vehicle_info);
+    if (utils::lane_change::isWithinTurnDirectionLanes(
+          getRouteHandler(), current_lane, ego_footprint)) {
+      RCLCPP_DEBUG(logger_, "ego intersects with turn direction lanes.");
+      return true;
+    }
+
+    RCLCPP_DEBUG(logger_, "ego doesn't intersects with turn direction lanes.");
+    return false;
+  });
+
+  return check_prepare_phase_in_intersection || check_prepare_phase_at_turns ||
          lane_change_parameters_->enable_collision_check_for_prepare_phase_in_general_lanes;
 }
 
