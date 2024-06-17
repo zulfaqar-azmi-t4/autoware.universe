@@ -48,6 +48,7 @@ using autoware::universe_utils::Polygon2d;
 using autoware_perception_msgs::msg::PredictedObject;
 using autoware_perception_msgs::msg::PredictedObjects;
 using autoware_perception_msgs::msg::PredictedPath;
+using behavior_path_planner::lane_change::CommonDataPtr;
 using behavior_path_planner::lane_change::LanesPolygon;
 using behavior_path_planner::lane_change::PathSafetyStatus;
 using geometry_msgs::msg::Point;
@@ -58,13 +59,6 @@ using tier4_planning_msgs::msg::PathWithLaneId;
 
 double calcLaneChangeResampleInterval(
   const double lane_changing_length, const double lane_changing_velocity);
-
-double calcMinimumLaneChangeLength(
-  const LaneChangeParameters & lane_change_parameters, const std::vector<double> & shift_intervals);
-
-double calcMinimumLaneChangeLength(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelet & lane,
-  const LaneChangeParameters & lane_change_parameters, Direction direction);
 
 double calcMaximumLaneChangeLength(
   const double current_velocity, const LaneChangeParameters & lane_change_parameters,
@@ -144,13 +138,7 @@ std::vector<DrivableLanes> generateDrivableLanes(
 double getLateralShift(const LaneChangePath & path);
 
 bool hasEnoughLengthToLaneChangeAfterAbort(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelets & current_lanes,
-  const Pose & curent_pose, const double abort_return_dist,
-  const LaneChangeParameters & lane_change_parameters, const Direction direction);
-
-double calcLateralBufferForFiltering(const double vehicle_width, const double lateral_buffer = 0.0);
-
-double calcLateralBufferForFiltering(const double vehicle_width, const double lateral_buffer);
+  const CommonDataPtr & common_data_ptr, const double abort_return_dist, const Direction direction);
 
 std::string getStrDirection(const std::string & name, const Direction direction);
 
@@ -278,23 +266,6 @@ bool isWithinIntersection(
  */
 bool isWithinTurnDirectionLanes(const lanelet::ConstLanelet & lanelet, const Polygon2d & polygon);
 
-/**
- * @brief Calculates the distance required during a lane change operation.
- *
- * Used for computing prepare or lane change length based on current and maximum velocity,
- * acceleration, and duration, returning the lesser of accelerated distance or distance at max
- * velocity.
- *
- * @param velocity The current velocity of the vehicle in meters per second (m/s).
- * @param maximum_velocity The maximum velocity the vehicle can reach in meters per second (m/s).
- * @param acceleration The acceleration of the vehicle in meters per second squared (m/s^2).
- * @param duration The duration of the lane change in seconds (s).
- * @return The calculated minimum distance in meters (m).
- */
-double calcPhaseLength(
-  const double velocity, const double maximum_velocity, const double acceleration,
-  const double time);
-
 LanesPolygon createLanesPolygon(
   const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
   const std::vector<lanelet::ConstLanelets> & target_backward_lanes);
@@ -302,11 +273,17 @@ LanesPolygon createLanesPolygon(
 
 namespace autoware::behavior_path_planner::utils::lane_change::debug
 {
+using behavior_path_planner::lane_change::SegmentMetric;
+using behavior_path_planner::lane_change::SegmentMetrics;
+
 geometry_msgs::msg::Point32 create_point32(const geometry_msgs::msg::Pose & pose);
 
 geometry_msgs::msg::Polygon createExecutionArea(
   const autoware::vehicle_info_utils::VehicleInfo & vehicle_info, const Pose & pose,
   double additional_lon_offset, double additional_lat_offset);
+
+void print_segment_metric(const SegmentMetric & metric);
+void print_segment_metrics(const SegmentMetrics & metrics);
 }  // namespace autoware::behavior_path_planner::utils::lane_change::debug
 
 #endif  // AUTOWARE__BEHAVIOR_PATH_LANE_CHANGE_MODULE__UTILS__UTILS_HPP_

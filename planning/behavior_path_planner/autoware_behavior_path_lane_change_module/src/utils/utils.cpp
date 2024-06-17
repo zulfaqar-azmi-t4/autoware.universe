@@ -14,6 +14,7 @@
 
 #include "autoware/behavior_path_lane_change_module/utils/utils.hpp"
 
+#include "autoware/behavior_path_lane_change_module/utils/calculation.hpp"
 #include "autoware/behavior_path_lane_change_module/utils/data_structs.hpp"
 #include "autoware/behavior_path_lane_change_module/utils/path.hpp"
 #include "autoware/behavior_path_planner_common/marker_utils/utils.hpp"
@@ -82,43 +83,6 @@ double calcLaneChangeResampleInterval(
   constexpr auto resampling_dt{0.2};
   return std::max(
     lane_changing_length / min_resampling_points, lane_changing_velocity * resampling_dt);
-}
-
-double calcMinimumLaneChangeLength(
-  const LaneChangeParameters & lane_change_parameters, const std::vector<double> & shift_intervals)
-{
-  if (shift_intervals.empty()) {
-    return 0.0;
-  }
-
-  const auto min_vel = lane_change_parameters.minimum_lane_changing_velocity;
-  const auto [min_lat_acc, max_lat_acc] =
-    lane_change_parameters.lane_change_lat_acc_map.find(min_vel);
-  const auto lat_jerk = lane_change_parameters.lane_changing_lateral_jerk;
-  const auto finish_judge_buffer = lane_change_parameters.lane_change_finish_judge_buffer;
-
-  const auto calc_sum = [&](double sum, double shift_interval) {
-    const auto t = PathShifter::calcShiftTimeFromJerk(shift_interval, lat_jerk, max_lat_acc);
-    return sum + (min_vel * t + finish_judge_buffer);
-  };
-
-  const auto total_length =
-    std::accumulate(shift_intervals.begin(), shift_intervals.end(), 0.0, calc_sum);
-
-  const auto backward_buffer = lane_change_parameters.backward_length_buffer_for_end_of_lane;
-  return total_length + backward_buffer * (static_cast<double>(shift_intervals.size()) - 1.0);
-}
-
-double calcMinimumLaneChangeLength(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelet & lane,
-  const LaneChangeParameters & lane_change_parameters, Direction direction)
-{
-  if (!route_handler) {
-    return std::numeric_limits<double>::max();
-  }
-
-  const auto shift_intervals = route_handler->getLateralIntervalsToPreferredLane(lane, direction);
-  return utils::lane_change::calcMinimumLaneChangeLength(lane_change_parameters, shift_intervals);
 }
 
 double calcMaximumLaneChangeLength(
@@ -338,8 +302,8 @@ std::optional<LaneChangePath> constructCandidatePath(
   const auto & original_lanes = lane_change_info.current_lanes;
   const auto & target_lanes = lane_change_info.target_lanes;
   const auto terminal_lane_changing_velocity = lane_change_info.terminal_lane_changing_velocity;
-  const auto longitudinal_acceleration = lane_change_info.longitudinal_acceleration;
-  const auto lane_change_velocity = lane_change_info.velocity;
+  const auto longitudinal_acceleration = lane_change_info.segment_metric.longitudinal_acceleration;
+  const auto lane_change_velocity = lane_change_info.segment_metric.velocity;
 
   PathShifter path_shifter;
   path_shifter.setPath(target_lane_reference_path);
@@ -659,33 +623,30 @@ double getLateralShift(const LaneChangePath & path)
 }
 
 bool hasEnoughLengthToLaneChangeAfterAbort(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelets & current_lanes,
-  const Pose & current_pose, const double abort_return_dist,
-  const LaneChangeParameters & lane_change_parameters, const Direction direction)
+  const CommonDataPtr & common_data_ptr, const double abort_return_dist, const Direction direction)
 {
+  const auto & current_lanes = common_data_ptr->lanes.current;
   if (current_lanes.empty()) {
     return false;
   }
 
-  const auto minimum_lane_change_length = calcMinimumLaneChangeLength(
-    route_handler, current_lanes.back(), lane_change_parameters, direction);
+  const auto minimum_lane_change_length =
+    calculation::calc_min_lane_change_length(common_data_ptr, current_lanes, direction);
   const auto abort_plus_lane_change_length = abort_return_dist + minimum_lane_change_length;
+  const auto current_pose = common_data_ptr->get_ego_pose();
   if (abort_plus_lane_change_length > utils::getDistanceToEndOfLane(current_pose, current_lanes)) {
     return false;
   }
 
+  const auto & goal_pose = common_data_ptr->route_handler_ptr->getGoalPose();
+
   if (
     abort_plus_lane_change_length >
-    utils::getSignedDistance(current_pose, route_handler->getGoalPose(), current_lanes)) {
+    utils::getSignedDistance(current_pose, goal_pose, current_lanes)) {
     return false;
   }
 
   return true;
-}
-
-double calcLateralBufferForFiltering(const double vehicle_width, const double lateral_buffer)
-{
-  return lateral_buffer + 0.5 * vehicle_width;
 }
 
 std::string getStrDirection(const std::string & name, const Direction direction)
@@ -799,10 +760,11 @@ std::vector<PoseWithVelocityStamped> convertToPredictedPath(
   }
 
   const auto & path = lane_change_path.path;
-  const auto prepare_acc = lane_change_path.info.longitudinal_acceleration.prepare;
-  const auto lane_changing_acc = lane_change_path.info.longitudinal_acceleration.lane_changing;
-  const auto duration = lane_change_path.info.duration.sum();
-  const auto prepare_time = lane_change_path.info.duration.prepare;
+  const auto prepare_acc = lane_change_path.info.segment_metric.longitudinal_acceleration.prepare;
+  const auto lane_changing_acc =
+    lane_change_path.info.segment_metric.longitudinal_acceleration.lane_changing;
+  const auto duration = lane_change_path.info.segment_metric.sum_duration();
+  const auto prepare_time = lane_change_path.info.segment_metric.duration.prepare;
   const auto & minimum_lane_changing_velocity =
     lane_change_parameters.minimum_lane_changing_velocity;
 
@@ -834,8 +796,9 @@ std::vector<PoseWithVelocityStamped> convertToPredictedPath(
   for (double t = prepare_time; t < duration; t += resolution) {
     const double delta_t = t - prepare_time;
     const double velocity = lane_changing_velocity + lane_changing_acc * delta_t;
-    const double length =
-      lane_changing_velocity * delta_t + 0.5 * lane_changing_acc * delta_t * delta_t + offset;
+    const double length = calculation::calc_length_with_acceleration(
+                            lane_changing_velocity, lane_changing_acc, delta_t) +
+                          offset;
     const auto pose = autoware::motion_utils::calcInterpolatedPose(
       path.points, vehicle_pose_frenet.length + length);
     predicted_path.emplace_back(t, pose, velocity);
@@ -1197,16 +1160,6 @@ bool isWithinTurnDirectionLanes(const lanelet::ConstLanelet & lanelet, const Pol
     polygon, utils::toPolygon2d(lanelet::utils::to2D(lanelet.polygon2d().basicPolygon())));
 }
 
-double calcPhaseLength(
-  const double velocity, const double maximum_velocity, const double acceleration,
-  const double duration)
-{
-  const auto length_with_acceleration =
-    velocity * duration + 0.5 * acceleration * std::pow(duration, 2);
-  const auto length_with_max_velocity = maximum_velocity * duration;
-  return std::min(length_with_acceleration, length_with_max_velocity);
-}
-
 LanesPolygon createLanesPolygon(
   const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
   const std::vector<lanelet::ConstLanelets> & target_backward_lanes)
@@ -1272,4 +1225,30 @@ geometry_msgs::msg::Polygon createExecutionArea(
   return polygon;
 }
 
+void print_segment_metric(const SegmentMetric & metric)
+{
+  RCLCPP_INFO(
+    utils::lane_change::get_logger(),
+    "Dur(Pre: %.4f, LC: %.4f), Lon Dist(Pre: %.4f, "
+    "LC: %.4f), Velocity(Pre: %.4f, LC: %.4f), Lon Acc(Pre: %.4f, LC: %.4f)",
+    metric.duration.prepare, metric.duration.lane_changing, metric.longitudinal_distance.prepare,
+    metric.longitudinal_distance.lane_changing, metric.velocity.prepare,
+    metric.velocity.lane_changing, metric.longitudinal_acceleration.prepare,
+    metric.longitudinal_acceleration.lane_changing);
+}
+
+void print_segment_metrics(const SegmentMetrics & metrics)
+{
+  int i = 0;
+  for (const auto & metric : metrics) {
+    RCLCPP_INFO(
+      utils::lane_change::get_logger(),
+      "[%d] Dur(Pre: %.4f, LC: %.4f), Lon Dist(Pre: %.4f, "
+      "LC: %.4f), Velocity(Pre: %.4f, LC: %.4f), Lon Acc(Pre: %.4f, LC: %.4f)",
+      ++i, metric.duration.prepare, metric.duration.lane_changing,
+      metric.longitudinal_distance.prepare, metric.longitudinal_distance.lane_changing,
+      metric.velocity.prepare, metric.velocity.lane_changing,
+      metric.longitudinal_acceleration.prepare, metric.longitudinal_acceleration.lane_changing);
+  }
+}
 }  // namespace autoware::behavior_path_planner::utils::lane_change::debug

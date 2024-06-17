@@ -103,6 +103,9 @@ public:
 
   // for goal
   bool isInGoalRouteSection(const lanelet::ConstLanelet & lanelet) const;
+
+  [[nodiscard]] bool is_in_goal_route_section(const lanelet::ConstLanelets & lanelets) const;
+
   Pose getGoalPose() const;
   Pose getStartPose() const;
   Pose getOriginalStartPose() const;

@@ -162,6 +162,15 @@ protected:
   bool hasEnoughLengthToTrafficLight(
     const LaneChangePath & path, const lanelet::ConstLanelets & current_lanes) const;
 
+  std::vector<lane_change::MetricBasedSegment> calc_prepare_segment_metrics(
+    const std::vector<double> & sampled_lon_acc_values) const;
+  std::vector<lane_change::MetricBasedSegment> calc_lane_changing_segment_metrics(
+    const lane_change::MetricBasedSegment & prepare_segment_metric,
+    const std::vector<double> & sampled_longitudinal_acc_values, const double shift_length) const;
+
+  lane_change::SegmentMetrics calc_segment_metric(
+    const std::vector<double> & sampled_longitudinal_acc_values, const double shift_length) const;
+
   bool getLaneChangePaths(
     const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
     Direction direction, LaneChangePaths * candidate_paths,

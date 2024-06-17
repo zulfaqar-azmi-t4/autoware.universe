@@ -543,6 +543,13 @@ bool RouteHandler::isInGoalRouteSection(const lanelet::ConstLanelet & lanelet) c
   return exists(route_ptr_->segments.back().primitives, lanelet.id());
 }
 
+bool RouteHandler::is_in_goal_route_section(const lanelet::ConstLanelets & lanelets) const
+{
+  return std::any_of(lanelets.rbegin(), lanelets.rend(), [&](const auto & lane) {
+    return isInGoalRouteSection(lane);
+  });
+}
+
 lanelet::ConstLanelets RouteHandler::getLaneletsFromIds(const lanelet::Ids & ids) const
 {
   lanelet::ConstLanelets lanelets;
