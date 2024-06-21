@@ -157,25 +157,33 @@ enum class LaneChangeStates {
   Stop,
 };
 
-struct LaneChangePhaseInfo
+struct SegmentValue
 {
   double prepare{0.0};
   double lane_changing{0.0};
 
+  SegmentValue(const double _prepare, const double _lane_changing)
+  : prepare(_prepare), lane_changing(_lane_changing)
+  {
+  }
+};
+
+struct SummableSegmentValue : public SegmentValue
+{
   [[nodiscard]] double sum() const { return prepare + lane_changing; }
 
-  LaneChangePhaseInfo(const double _prepare, const double _lane_changing)
-  : prepare(_prepare), lane_changing(_lane_changing)
+  SummableSegmentValue(const double _prepare, const double _lane_changing)
+  : SegmentValue(_prepare, _lane_changing)
   {
   }
 };
 
 struct LaneChangeInfo
 {
-  LaneChangePhaseInfo longitudinal_acceleration{0.0, 0.0};
-  LaneChangePhaseInfo velocity{0.0, 0.0};
-  LaneChangePhaseInfo duration{0.0, 0.0};
-  LaneChangePhaseInfo length{0.0, 0.0};
+  SegmentValue longitudinal_acceleration{0.0, 0.0};
+  SegmentValue velocity{0.0, 0.0};
+  SummableSegmentValue duration{0.0, 0.0};
+  SummableSegmentValue length{0.0, 0.0};
 
   lanelet::ConstLanelets current_lanes{};
   lanelet::ConstLanelets target_lanes{};
