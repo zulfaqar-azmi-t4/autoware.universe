@@ -48,6 +48,7 @@ using autoware::universe_utils::Polygon2d;
 using autoware_perception_msgs::msg::PredictedObject;
 using autoware_perception_msgs::msg::PredictedObjects;
 using autoware_perception_msgs::msg::PredictedPath;
+using behavior_path_planner::lane_change::CommonDataPtr;
 using behavior_path_planner::lane_change::LanesPolygon;
 using behavior_path_planner::lane_change::PathSafetyStatus;
 using geometry_msgs::msg::Point;
@@ -58,13 +59,6 @@ using tier4_planning_msgs::msg::PathWithLaneId;
 
 double calcLaneChangeResampleInterval(
   const double lane_changing_length, const double lane_changing_velocity);
-
-double calcMinimumLaneChangeLength(
-  const LaneChangeParameters & lane_change_parameters, const std::vector<double> & shift_intervals);
-
-double calcMinimumLaneChangeLength(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelet & lane,
-  const LaneChangeParameters & lane_change_parameters, Direction direction);
 
 double calcMaximumLaneChangeLength(
   const double current_velocity, const LaneChangeParameters & lane_change_parameters,
