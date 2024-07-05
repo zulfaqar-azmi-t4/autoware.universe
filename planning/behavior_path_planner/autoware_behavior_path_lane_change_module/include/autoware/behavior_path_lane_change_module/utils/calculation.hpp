@@ -36,29 +36,7 @@ double calc_ego_remaining_distance_in_current_lanes(const CommonDataPtr & common
 double calc_ego_remaining_distance_in_lanes(
   const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & lanes);
 
-double calc_length_with_acceleration(
-  const double velocity, const double acceleration, const double duration);
-
-double calc_prepare_segment_length(
-  const double velocity, const double maximum_velocity, const double acceleration,
-  const double duration);
-
-double calc_lane_changing_segment_length(
-  const double velocity, const double minimum_velocity, const double maximum_velocity,
-  const double acceleration, const double duration);
-
 double calc_lane_changing_duration(
   const double shift_length, const double lat_acc, const double lat_jerk);
-
-double calc_shift_length(
-  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & lane);
-
-double calc_acceleration(
-  const double current_velocity, const double target_velocity, const double duration);
-
-double calc_minimum_longitudinal_acceleration(const CommonDataPtr & common_data_ptr);
-
-double calc_maximum_longitudinal_acceleration(
-  const CommonDataPtr & common_data_ptr, const double max_path_velocity);
 }  // namespace autoware::behavior_path_planner::utils::lane_change::calculation
 #endif  // AUTOWARE__BEHAVIOR_PATH_LANE_CHANGE_MODULE__UTILS__CALCULATION_HPP_
