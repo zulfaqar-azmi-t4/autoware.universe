@@ -19,6 +19,7 @@
 #include "tier4_autoware_utils/ros/update_param.hpp"
 
 #include <rclcpp/rclcpp.hpp>
+#include <tier4_autoware_utils/math/unit_conversion.hpp>
 
 #include <memory>
 #include <string>
@@ -224,6 +225,12 @@ void LaneChangeModuleManager::initParams(rclcpp::Node * node)
 
   p.finish_judge_lateral_threshold =
     getOrDeclareParameter<double>(*node, parameter("finish_judge_lateral_threshold"));
+
+  const auto finish_judge_lateral_angle_deviation =
+    getOrDeclareParameter<double>(*node, parameter("finish_judge_lateral_angle_deviation"));
+
+  p.finish_judge_lateral_angle_deviation =
+    tier4_autoware_utils::deg2rad(finish_judge_lateral_angle_deviation);
 
   // debug marker
   p.publish_debug_marker = getOrDeclareParameter<bool>(*node, parameter("publish_debug_marker"));

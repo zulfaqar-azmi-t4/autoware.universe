@@ -297,6 +297,8 @@ double calcPhaseLength(
 LanesPolygon createLanesPolygon(
   const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
   const std::vector<lanelet::ConstLanelets> & target_backward_lanes);
+
+double calc_angle_to_lanelet_segment(const lanelet::ConstLanelets & lanelets, const Pose & pose);
 }  // namespace behavior_path_planner::utils::lane_change
 
 namespace behavior_path_planner::utils::lane_change::debug

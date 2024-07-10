@@ -31,6 +31,7 @@
 #include <motion_utils/trajectory/path_with_lane_id.hpp>
 #include <motion_utils/trajectory/trajectory.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <route_handler/route_handler.hpp>
 #include <tier4_autoware_utils/geometry/boost_geometry.hpp>
 #include <tier4_autoware_utils/geometry/boost_polygon_utils.hpp>
 #include <vehicle_info_util/vehicle_info.hpp>
@@ -39,6 +40,7 @@
 
 #include <boost/geometry/algorithms/detail/disjoint/interface.hpp>
 
+#include <lanelet2_core/Forward.h>
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_core/geometry/Point.h>
@@ -1224,6 +1226,17 @@ LanesPolygon createLanesPolygon(
     }
   }
   return lanes_polygon;
+}
+
+double calc_angle_to_lanelet_segment(const lanelet::ConstLanelets & lanelets, const Pose & pose)
+{
+  lanelet::ConstLanelet closest_lanelet;
+
+  if (!lanelet::utils::query::getClosestLanelet(lanelets, pose, &closest_lanelet)) {
+    return tier4_autoware_utils::deg2rad(180);
+  }
+  const auto closest_pose = lanelet::utils::getClosestCenterPose(closest_lanelet, pose.position);
+  return std::abs(tier4_autoware_utils::calcYawDeviation(closest_pose, pose));
 }
 }  // namespace behavior_path_planner::utils::lane_change
 
