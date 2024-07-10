@@ -30,10 +30,10 @@ using behavior_path_planner::utils::path_safety_checker::ExtendedPredictedObject
 using behavior_path_planner::utils::path_safety_checker::PoseWithVelocityAndPolygonStamped;
 using behavior_path_planner::utils::path_safety_checker::PoseWithVelocityStamped;
 using behavior_path_planner::utils::path_safety_checker::PredictedPathWithPolygon;
-using data::lane_change::LanesPolygon;
 using geometry_msgs::msg::Point;
 using geometry_msgs::msg::Pose;
 using geometry_msgs::msg::Twist;
+using lane_change::LanesPolygon;
 using route_handler::Direction;
 using utils::path_safety_checker::ExtendedPredictedObjects;
 

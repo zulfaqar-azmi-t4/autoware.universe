@@ -30,7 +30,7 @@
 namespace marker_utils::lane_change_markers
 {
 using behavior_path_planner::LaneChangePath;
-using behavior_path_planner::data::lane_change::Debug;
+using behavior_path_planner::lane_change::Debug;
 using behavior_path_planner::utils::path_safety_checker::ExtendedPredictedObjects;
 using visualization_msgs::msg::MarkerArray;
 MarkerArray showAllValidLaneChangePath(
