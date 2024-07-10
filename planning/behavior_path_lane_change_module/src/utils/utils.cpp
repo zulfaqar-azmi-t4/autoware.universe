@@ -337,8 +337,8 @@ std::optional<LaneChangePath> constructCandidatePath(
   const std::vector<std::vector<int64_t>> & sorted_lane_ids)
 {
   const auto & shift_line = lane_change_info.shift_line;
-  const auto & original_lanes = lane_change_info.current_lanes;
-  const auto & target_lanes = lane_change_info.target_lanes;
+  const auto & original_lanes = lane_change_info.lanes.current;
+  const auto & target_lanes = lane_change_info.lanes.target;
   const auto terminal_lane_changing_velocity = lane_change_info.terminal_lane_changing_velocity;
   const auto longitudinal_acceleration = lane_change_info.longitudinal_acceleration;
   const auto lane_change_velocity = lane_change_info.velocity;
@@ -972,7 +972,7 @@ bool passParkedObject(
   const auto & object_shiftable_ratio_threshold =
     lane_change_parameters.object_shiftable_ratio_threshold;
   const auto & path = lane_change_path.path;
-  const auto & current_lanes = lane_change_path.info.current_lanes;
+  const auto & current_lanes = lane_change_path.info.lanes.current;
   const auto current_lane_path =
     route_handler.getCenterLinePath(current_lanes, 0.0, std::numeric_limits<double>::max());
 

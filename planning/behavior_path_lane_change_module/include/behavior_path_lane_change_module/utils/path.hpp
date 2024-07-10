@@ -23,31 +23,30 @@
 
 #include <vector>
 
-namespace behavior_path_planner
+namespace behavior_path_planner::lane_change
 {
 using autoware_auto_planning_msgs::msg::PathWithLaneId;
 using behavior_path_planner::TurnSignalInfo;
-struct LaneChangePath
+struct Path
 {
   PathWithLaneId path{};
   ShiftedPath shifted_path{};
-  PathWithLaneId prev_path{};
-  LaneChangeInfo info{};
+  Info info{};
 };
-using LaneChangePaths = std::vector<LaneChangePath>;
 
-struct LaneChangeStatus
+struct Status
 {
-  PathWithLaneId lane_follow_path{};
-  LaneChangePath lane_change_path{};
-  lanelet::ConstLanelets current_lanes{};
-  lanelet::ConstLanelets target_lanes{};
-  std::vector<lanelet::Id> lane_follow_lane_ids{};
-  std::vector<lanelet::Id> lane_change_lane_ids{};
+  Path lane_change_path{};
   bool is_safe{false};
   bool is_valid_path{false};
   double start_distance{0.0};
 };
+}  // namespace behavior_path_planner::lane_change
 
+namespace behavior_path_planner
+{
+using LaneChangePath = lane_change::Path;
+using LaneChangePaths = std::vector<lane_change::Path>;
+using LaneChangeStatus = lane_change::Status;
 }  // namespace behavior_path_planner
 #endif  // BEHAVIOR_PATH_LANE_CHANGE_MODULE__UTILS__PATH_HPP_

@@ -50,7 +50,10 @@ public:
   LaneChangeBase(
     std::shared_ptr<LaneChangeParameters> parameters, LaneChangeModuleType type,
     Direction direction)
-  : lane_change_parameters_{std::move(parameters)}, direction_{direction}, type_{type}
+  : lane_change_parameters_{std::move(parameters)},
+    common_data_ptr_{std::make_shared<lane_change::CommonData>()},
+    direction_{direction},
+    type_{type}
   {
   }
 
@@ -59,6 +62,8 @@ public:
   LaneChangeBase & operator=(const LaneChangeBase &) = delete;
   LaneChangeBase & operator=(LaneChangeBase &&) = delete;
   virtual ~LaneChangeBase() = default;
+
+  virtual void updateLanes(const bool is_approved) = 0;
 
   virtual void updateLaneChangeStatus() = 0;
 
@@ -151,7 +156,19 @@ public:
 
   bool isValidPath() const { return status_.is_valid_path; }
 
-  void setData(const std::shared_ptr<const PlannerData> & data) { planner_data_ = data; }
+  void setData(const std::shared_ptr<const PlannerData> & data)
+  {
+    planner_data_ = data;
+    if (!common_data_ptr_->bpp_param_ptr) {
+      common_data_ptr_->bpp_param_ptr =
+        std::make_shared<BehaviorPathPlannerParameters>(data->parameters);
+    }
+
+    common_data_ptr_->self_odometry_ptr = data->self_odometry;
+    common_data_ptr_->route_handler_ptr = data->route_handler;
+    common_data_ptr_->lc_param_ptr = lane_change_parameters_;
+    common_data_ptr_->direction = direction_;
+  }
 
   void toNormalState() { current_lane_change_state_ = LaneChangeStates::Normal; }
 
@@ -190,8 +207,6 @@ public:
   virtual TurnSignalInfo get_current_turn_signal_info() = 0;
 
 protected:
-  virtual lanelet::ConstLanelets getCurrentLanes() const = 0;
-
   virtual int getNumToPreferredLane(const lanelet::ConstLanelet & lane) const = 0;
 
   virtual PathWithLaneId getPrepareSegment(
@@ -217,6 +232,8 @@ protected:
   LaneChangeStates current_lane_change_state_{};
 
   std::shared_ptr<LaneChangeParameters> lane_change_parameters_{};
+  lane_change::CommonDataPtr common_data_ptr_;
+
   std::shared_ptr<LaneChangePath> abort_path_{};
   std::shared_ptr<const PlannerData> planner_data_{};
   BehaviorModuleOutput prev_module_output_{};

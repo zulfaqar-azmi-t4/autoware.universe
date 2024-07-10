@@ -185,6 +185,13 @@ struct PhaseInfo
   }
 };
 
+struct Lanes
+{
+  lanelet::ConstLanelets current;
+  lanelet::ConstLanelets target;
+  std::vector<lanelet::ConstLanelets> preceding_target;
+};
+
 struct Info
 {
   PhaseInfo longitudinal_acceleration{0.0, 0.0};
@@ -192,8 +199,7 @@ struct Info
   PhaseInfo duration{0.0, 0.0};
   PhaseInfo length{0.0, 0.0};
 
-  lanelet::ConstLanelets current_lanes{};
-  lanelet::ConstLanelets target_lanes{};
+  Lanes lanes;
 
   Pose lane_changing_start{};
   Pose lane_changing_end{};
@@ -230,19 +236,13 @@ struct LanesPolygon
   std::vector<lanelet::BasicPolygon2d> target_backward;
 };
 
-struct Lanes
-{
-  lanelet::ConstLanelets current;
-  lanelet::ConstLanelets target;
-  std::vector<lanelet::ConstLanelets> preceding_target;
-};
-
 struct CommonData
 {
   std::shared_ptr<RouteHandler> route_handler_ptr;
   Odometry::ConstSharedPtr self_odometry_ptr;
   std::shared_ptr<BehaviorPathPlannerParameters> bpp_param_ptr;
   std::shared_ptr<Parameters> lc_param_ptr;
+  std::shared_ptr<LanesObjects> filtered_objects_ptr;
   Lanes lanes;
   Direction direction;
 
