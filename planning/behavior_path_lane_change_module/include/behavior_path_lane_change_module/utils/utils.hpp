@@ -42,6 +42,8 @@ using autoware_auto_perception_msgs::msg::PredictedObject;
 using autoware_auto_perception_msgs::msg::PredictedObjects;
 using autoware_auto_perception_msgs::msg::PredictedPath;
 using autoware_auto_planning_msgs::msg::PathWithLaneId;
+using behavior_path_planner::lane_change::CommonDataPtr;
+using behavior_path_planner::lane_change::Lanes;
 using behavior_path_planner::lane_change::LanesPolygon;
 using behavior_path_planner::lane_change::PathSafetyStatus;
 using behavior_path_planner::utils::path_safety_checker::ExtendedPredictedObject;
@@ -194,7 +196,8 @@ ExtendedPredictedObject transform(
   const LaneChangeParameters & lane_change_parameters, const bool check_at_prepare_phase);
 
 bool isCollidedPolygonsInLanelet(
-  const std::vector<Polygon2d> & collided_polygons, const lanelet::ConstLanelets & lanes);
+  const std::vector<Polygon2d> & collided_polygons,
+  const std::optional<lanelet::BasicPolygon2d> & lanes_polygon);
 
 /**
  * @brief Generates expanded lanelets based on the given direction and offsets.
@@ -294,11 +297,13 @@ double calcPhaseLength(
   const double velocity, const double maximum_velocity, const double acceleration,
   const double time);
 
-LanesPolygon createLanesPolygon(
-  const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
-  const std::vector<lanelet::ConstLanelets> & target_backward_lanes);
+LanesPolygon createLanesPolygon(const CommonDataPtr & common_data_ptr);
 
 double calc_angle_to_lanelet_segment(const lanelet::ConstLanelets & lanelets, const Pose & pose);
+
+bool is_same_lane_with_prev_iteration(
+  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & current_lanes,
+  const lanelet::ConstLanelets & target_lanes);
 }  // namespace behavior_path_planner::utils::lane_change
 
 namespace behavior_path_planner::utils::lane_change::debug

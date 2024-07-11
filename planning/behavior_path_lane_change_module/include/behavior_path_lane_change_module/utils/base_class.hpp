@@ -139,6 +139,8 @@ public:
 
   const Twist & getEgoTwist() const { return planner_data_->self_odometry->twist.twist; }
 
+  const lanelet::ConstLanelets get_current_lanes() const {return common_data_ptr_->lanes.current;}
+
   const BehaviorPathPlannerParameters & getCommonParam() const { return planner_data_->parameters; }
 
   LaneChangeParameters getLaneChangeParam() const { return *lane_change_parameters_; }

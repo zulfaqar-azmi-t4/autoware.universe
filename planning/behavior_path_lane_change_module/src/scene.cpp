@@ -60,22 +60,38 @@ void NormalLaneChange::updateLanes(const bool is_approved)
     return;
   }
 
-  common_data_ptr_->lanes.current =
+  const auto current_lanes =
     utils::getCurrentLanesFromPath(prev_module_output_.path, planner_data_);
 
-  if (common_data_ptr_->lanes.current.empty()) {
+  if (current_lanes.empty()) {
     return;
   }
 
-  common_data_ptr_->lanes.target = getLaneChangeLanes(common_data_ptr_->lanes.current, direction_);
-
-  if (common_data_ptr_->lanes.target.empty()) {
+  const auto target_lanes = getLaneChangeLanes(current_lanes, direction_);
+  if (target_lanes.empty()) {
     return;
   }
+
+  const auto is_same_lanes_with_prev_iteration =
+    utils::lane_change::is_same_lane_with_prev_iteration(
+      common_data_ptr_, current_lanes, target_lanes);
+
+  if (is_same_lanes_with_prev_iteration) {
+    return;
+  }
+
+  common_data_ptr_->lanes.current = current_lanes;
+  common_data_ptr_->lanes.target = target_lanes;
 
   common_data_ptr_->lanes.preceding_target = utils::getPrecedingLanelets(
     *common_data_ptr_->route_handler_ptr, common_data_ptr_->lanes.target,
     common_data_ptr_->get_ego_pose(), common_data_ptr_->lc_param_ptr->backward_lane_length);
+
+  if (!common_data_ptr_->lanes_polygon_ptr) {
+    common_data_ptr_->lanes_polygon_ptr = std::make_shared<lane_change::LanesPolygon>();
+  }
+
+  *common_data_ptr_->lanes_polygon_ptr = createLanesPolygon(common_data_ptr_);
 }
 
 void NormalLaneChange::updateLaneChangeStatus()
@@ -95,9 +111,13 @@ void NormalLaneChange::updateLaneChangeStatus()
 
 std::pair<bool, bool> NormalLaneChange::getSafePath(LaneChangePath & safe_path) const
 {
-  // find candidate paths
   const auto & current_lanes = common_data_ptr_->lanes.current;
   const auto & target_lanes = common_data_ptr_->lanes.target;
+
+  if (current_lanes.empty() || target_lanes.empty()) {
+    return {false, false};
+  }
+
   LaneChangePaths valid_paths{};
   const bool is_stuck = isVehicleStuck(current_lanes);
   bool found_safe_path = getLaneChangePaths(
@@ -128,16 +148,16 @@ std::pair<bool, bool> NormalLaneChange::getSafePath(LaneChangePath & safe_path) 
 
 bool NormalLaneChange::isLaneChangeRequired()
 {
-  common_data_ptr_->lanes.current =
+  const auto current_lanes =
     utils::getCurrentLanesFromPath(prev_module_output_.path, planner_data_);
 
-  if (common_data_ptr_->lanes.current.empty()) {
+  if (current_lanes.empty()) {
     return false;
   }
 
-  common_data_ptr_->lanes.target = getLaneChangeLanes(common_data_ptr_->lanes.current, direction_);
+  const auto target_lanes = getLaneChangeLanes(current_lanes, direction_);
 
-  return !common_data_ptr_->lanes.target.empty();
+  return !target_lanes.empty();
 }
 
 bool NormalLaneChange::isStoppedAtRedTrafficLight() const
@@ -672,8 +692,7 @@ bool NormalLaneChange::hasFinishedLaneChange() const
     dist_to_lane_change_end + finish_judge_buffer;
 
   if (has_passed_end_pose) {
-    const auto lanes_polygon = utils::lane_change::createPolygon(
-      common_data_ptr_->lanes.target, 0.0, std::numeric_limits<double>::max());
+    const auto lanes_polygon = common_data_ptr_->lanes_polygon_ptr->target;
     return !boost::geometry::disjoint(
       utils::toPolygon2d(lanes_polygon.value()),
       lanelet::utils::to2D(lanelet::utils::conversion::toLaneletPoint(current_pose.position)));
@@ -1153,12 +1172,7 @@ void NormalLaneChange::filterObjectsByLanelets(
       });
   }
 
-  const auto expanded_target_lanes = utils::lane_change::generateExpandedLanelets(
-    target_lanes, direction_, lane_change_parameters_->lane_expansion_left_offset,
-    lane_change_parameters_->lane_expansion_right_offset);
-
-  const auto lanes_polygon =
-    createLanesPolygon(current_lanes, expanded_target_lanes, target_backward_lanes);
+  const auto & lanes_polygon = *common_data_ptr_->lanes_polygon_ptr;
   const auto dist_ego_to_current_lanes_center =
     lanelet::utils::getLateralDistanceToClosestLanelet(current_lanes, current_pose);
 
@@ -1178,7 +1192,7 @@ void NormalLaneChange::filterObjectsByLanelets(
       return std::abs(lateral) > (common_parameters.vehicle_width / 2);
     });
 
-    if (check_optional_polygon(object, lanes_polygon.target) && is_lateral_far) {
+    if (check_optional_polygon(object, lanes_polygon.expanded_target) && is_lateral_far) {
       target_lane_objects.push_back(object);
       continue;
     }
@@ -1188,7 +1202,7 @@ void NormalLaneChange::filterObjectsByLanelets(
         return isPolygonOverlapLanelet(object, target_backward_polygon);
       };
       return std::any_of(
-        lanes_polygon.target_backward.begin(), lanes_polygon.target_backward.end(),
+        lanes_polygon.preceeding_target.begin(), lanes_polygon.preceeding_target.end(),
         check_backward_polygon);
     });
 
@@ -1515,9 +1529,7 @@ bool NormalLaneChange::getLaneChangePaths(
           prepare_segment.points.back().point.pose.position.x,
           prepare_segment.points.back().point.pose.position.y);
 
-        const auto target_lane_polygon = lanelet::utils::getPolygonFromArcLength(
-          target_lanes, 0, std::numeric_limits<double>::max());
-        const auto target_lane_poly_2d = lanelet::utils::to2D(target_lane_polygon).basicPolygon();
+        const auto target_lane_poly_2d = common_data_ptr_->lanes_polygon_ptr->target.value();
 
         const auto is_valid_start_point =
           boost::geometry::covered_by(lc_start_point, target_neighbor_preferred_lane_poly_2d) ||
@@ -1794,6 +1806,10 @@ PathSafetyStatus NormalLaneChange::isApprovedPathSafe() const
   const auto & current_lanes = common_data_ptr_->lanes.current;
   const auto & target_lanes = common_data_ptr_->lanes.target;
 
+  if (current_lanes.empty() || target_lanes.empty()) {
+    return {true, true};
+  }
+
   const auto filtered_objects = filterObjects(current_lanes, target_lanes);
   const auto target_objects = getTargetObjects(filtered_objects, current_lanes);
 
@@ -2061,10 +2077,8 @@ PathSafetyStatus NormalLaneChange::isLaneChangePathSafe(
   const auto debug_predicted_path =
     utils::path_safety_checker::convertToPredictedPath(ego_predicted_path, time_resolution);
 
-  const auto expanded_target_lanes = utils::lane_change::generateExpandedLanelets(
-    lane_change_path.info.lanes.target, direction_,
-    lane_change_parameters_->lane_expansion_left_offset,
-    lane_change_parameters_->lane_expansion_right_offset);
+  const auto & current_lanes_polygon = common_data_ptr_->lanes_polygon_ptr->current;
+  const auto & expanded_targe_polygon = common_data_ptr_->lanes_polygon_ptr->expanded_target;
 
   for (const auto & obj : collision_check_objects) {
     auto current_debug_data = utils::path_safety_checker::createObjectDebug(obj);
@@ -2082,10 +2096,10 @@ PathSafetyStatus NormalLaneChange::isLaneChangePathSafe(
         continue;
       }
 
-      const auto collision_in_current_lanes = utils::lane_change::isCollidedPolygonsInLanelet(
-        collided_polygons, lane_change_path.info.lanes.current);
+      const auto collision_in_current_lanes =
+        utils::lane_change::isCollidedPolygonsInLanelet(collided_polygons, current_lanes_polygon);
       const auto collision_in_target_lanes =
-        utils::lane_change::isCollidedPolygonsInLanelet(collided_polygons, expanded_target_lanes);
+        utils::lane_change::isCollidedPolygonsInLanelet(collided_polygons, expanded_targe_polygon);
 
       if (!collision_in_current_lanes && !collision_in_target_lanes) {
         utils::path_safety_checker::updateCollisionCheckDebugMap(

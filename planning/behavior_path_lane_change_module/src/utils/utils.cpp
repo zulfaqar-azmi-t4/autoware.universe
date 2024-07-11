@@ -1134,10 +1134,9 @@ ExtendedPredictedObject transform(
 }
 
 bool isCollidedPolygonsInLanelet(
-  const std::vector<Polygon2d> & collided_polygons, const lanelet::ConstLanelets & lanes)
+  const std::vector<Polygon2d> & collided_polygons,
+  const std::optional<lanelet::BasicPolygon2d> & lanes_polygon)
 {
-  const auto lanes_polygon = createPolygon(lanes, 0.0, std::numeric_limits<double>::max());
-
   const auto is_in_lanes = [&](const auto & collided_polygon) {
     return lanes_polygon && boost::geometry::intersects(lanes_polygon.value(), collided_polygon);
   };
@@ -1206,23 +1205,30 @@ double calcPhaseLength(
   return std::min(length_with_acceleration, length_with_max_velocity);
 }
 
-LanesPolygon createLanesPolygon(
-  const lanelet::ConstLanelets & current_lanes, const lanelet::ConstLanelets & target_lanes,
-  const std::vector<lanelet::ConstLanelets> & target_backward_lanes)
+LanesPolygon createLanesPolygon(const CommonDataPtr & common_data_ptr)
 {
+  const auto & lanes = common_data_ptr->lanes;
   LanesPolygon lanes_polygon;
 
   lanes_polygon.current =
-    utils::lane_change::createPolygon(current_lanes, 0.0, std::numeric_limits<double>::max());
+    utils::lane_change::createPolygon(lanes.current, 0.0, std::numeric_limits<double>::max());
   lanes_polygon.target =
-    utils::lane_change::createPolygon(target_lanes, 0.0, std::numeric_limits<double>::max());
+    utils::lane_change::createPolygon(lanes.target, 0.0, std::numeric_limits<double>::max());
 
-  for (const auto & target_backward_lane : target_backward_lanes) {
-    auto lane_polygon = utils::lane_change::createPolygon(
-      target_backward_lane, 0.0, std::numeric_limits<double>::max());
+  const auto & lc_param_ptr = common_data_ptr->lc_param_ptr;
+  const auto expanded_target_lanes = utils::lane_change::generateExpandedLanelets(
+    lanes.target, common_data_ptr->direction, lc_param_ptr->lane_expansion_left_offset,
+    lc_param_ptr->lane_expansion_right_offset);
+  lanes_polygon.preceeding_target.reserve(lanes.preceding_target.size());
+  lanes_polygon.expanded_target = utils::lane_change::createPolygon(
+    expanded_target_lanes, 0.0, std::numeric_limits<double>::max());
+
+  for (const auto & preceeding_lane : lanes.preceding_target) {
+    auto lane_polygon =
+      utils::lane_change::createPolygon(preceeding_lane, 0.0, std::numeric_limits<double>::max());
 
     if (lane_polygon) {
-      lanes_polygon.target_backward.push_back(*lane_polygon);
+      lanes_polygon.preceeding_target.push_back(*lane_polygon);
     }
   }
   return lanes_polygon;
@@ -1237,6 +1243,27 @@ double calc_angle_to_lanelet_segment(const lanelet::ConstLanelets & lanelets, co
   }
   const auto closest_pose = lanelet::utils::getClosestCenterPose(closest_lanelet, pose.position);
   return std::abs(tier4_autoware_utils::calcYawDeviation(closest_pose, pose));
+}
+
+bool is_same_lane_with_prev_iteration(
+  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & current_lanes,
+  const lanelet::ConstLanelets & target_lanes)
+{
+  const auto & prev_current_lanes = common_data_ptr->lanes.current;
+  const auto & prev_target_lanes = common_data_ptr->lanes.target;
+  if (
+    prev_current_lanes.empty() || prev_target_lanes.empty() || current_lanes.empty() ||
+    target_lanes.empty()) {
+    return false;
+  }
+
+  if (
+    (prev_current_lanes.front().id() == current_lanes.front().id()) &&
+    (prev_current_lanes.back().id() == prev_current_lanes.back().id())) {
+    return false;
+  }
+  return (prev_target_lanes.front().id() == target_lanes.front().id()) &&
+         (prev_target_lanes.back().id() == prev_target_lanes.back().id());
 }
 }  // namespace behavior_path_planner::utils::lane_change
 

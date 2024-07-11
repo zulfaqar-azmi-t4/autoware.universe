@@ -233,7 +233,8 @@ struct LanesPolygon
 {
   std::optional<lanelet::BasicPolygon2d> current;
   std::optional<lanelet::BasicPolygon2d> target;
-  std::vector<lanelet::BasicPolygon2d> target_backward;
+  std::optional<lanelet::BasicPolygon2d> expanded_target;
+  std::vector<lanelet::BasicPolygon2d> preceeding_target;
 };
 
 struct CommonData
@@ -243,6 +244,7 @@ struct CommonData
   std::shared_ptr<BehaviorPathPlannerParameters> bpp_param_ptr;
   std::shared_ptr<Parameters> lc_param_ptr;
   std::shared_ptr<LanesObjects> filtered_objects_ptr;
+  std::shared_ptr<LanesPolygon> lanes_polygon_ptr;
   Lanes lanes;
   Direction direction;
 
@@ -267,6 +269,7 @@ using BppParamPtr = std::shared_ptr<BehaviorPathPlannerParameters>;
 using LCParamPtr = std::shared_ptr<Parameters>;
 using CommonDataPtr = std::shared_ptr<CommonData>;
 using LanesPtr = std::shared_ptr<Lanes>;
+using LanesPolygonPtr = std::shared_ptr<LanesPolygon>;
 }  // namespace behavior_path_planner::lane_change
 
 namespace behavior_path_planner
