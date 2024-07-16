@@ -1190,21 +1190,34 @@ void NormalLaneChange::filterObjectsByLanelets(
     other_lane_objects.reserve(reserve_size);
   }
 
-  for (const auto & object : objects.objects) {
-    const auto is_lateral_far = std::invoke([&]() -> bool {
-      const auto dist_object_to_current_lanes_center =
-        lanelet::utils::getLateralDistanceToClosestLanelet(
-          current_lanes, object.kinematics.initial_pose_with_covariance.pose);
-      const auto lateral = dist_object_to_current_lanes_center - dist_ego_to_current_lanes_center;
-      return std::abs(lateral) > (common_parameters.vehicle_width / 2);
-    });
+  const auto is_lateral_far = [&](const auto & object) -> bool {
+    const auto dist_object_to_current_lanes_center =
+      lanelet::utils::getLateralDistanceToClosestLanelet(
+        current_lanes, object.kinematics.initial_pose_with_covariance.pose);
+    const auto lateral = dist_object_to_current_lanes_center - dist_ego_to_current_lanes_center;
+    return std::abs(lateral) > (common_parameters.vehicle_width / 2);
+  };
 
-    if (check_optional_polygon(object, lanes_polygon.expanded_target) && is_lateral_far) {
+  for (const auto & object : objects.objects) {
+    const auto is_not_within_ego_width = is_lateral_far(object);
+    if (check_optional_polygon(object, lanes_polygon.target) && is_not_within_ego_width) {
       target_lane_objects.push_back(object);
       continue;
     }
 
-    const auto is_overlap_target_backward = std::invoke([&]() -> bool {
+    const auto obj_vel_norm = std::hypot(
+      object.kinematics.initial_twist_with_covariance.twist.linear.x,
+      object.kinematics.initial_twist_with_covariance.twist.linear.y);
+    const auto static_object_vel_thresh =
+      common_data_ptr_->lc_param_ptr->static_object_velocity_threshold;
+    if (
+      check_optional_polygon(object, lanes_polygon.expanded_target) &&
+      obj_vel_norm < static_object_vel_thresh && is_not_within_ego_width) {
+      target_lane_objects.push_back(object);
+      continue;
+    }
+
+    const auto is_overlap_with_preceding_target_lanes = std::invoke([&]() -> bool {
       const auto check_backward_polygon = [&object](const auto & target_backward_polygon) {
         return isPolygonOverlapLanelet(object, target_backward_polygon);
       };
@@ -1214,7 +1227,7 @@ void NormalLaneChange::filterObjectsByLanelets(
     });
 
     // check if the object intersects with target backward lanes
-    if (is_overlap_target_backward) {
+    if (is_overlap_with_preceding_target_lanes) {
       target_lane_objects.push_back(object);
       continue;
     }
