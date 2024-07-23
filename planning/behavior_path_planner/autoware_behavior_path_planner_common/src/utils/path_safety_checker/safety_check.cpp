@@ -615,18 +615,6 @@ std::vector<Polygon2d> getCollidedPolygons(
     const double yaw_difference = autoware::universe_utils::normalizeRadian(ego_yaw - object_yaw);
     if (std::abs(yaw_difference) > yaw_difference_th) continue;
 
-    // check overlap
-    if (boost::geometry::overlaps(ego_polygon, obj_polygon)) {
-      debug.unsafe_reason = "overlap_polygon";
-      collided_polygons.push_back(obj_polygon);
-
-      debug.expected_ego_pose = ego_pose;
-      debug.expected_obj_pose = obj_pose;
-      debug.extended_ego_polygon = ego_polygon;
-      debug.extended_obj_polygon = obj_polygon;
-      continue;
-    }
-
     // compute which one is at the front of the other
     const bool is_object_front = isTargetObjectFront(ego_pose, obj_polygon, ego_vehicle_info);
     const auto & [front_object_velocity, rear_object_velocity] =
