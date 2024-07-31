@@ -1402,10 +1402,8 @@ bool NormalLaneChange::getLaneChangePaths(
   for (const auto & prepare_duration : prepare_durations) {
     for (const auto & sampled_longitudinal_acc : longitudinal_acc_sampling_values) {
       const auto debug_print = [&](const auto & s) {
-        RCLCPP_DEBUG_STREAM(
-          logger_, "  -  " << s << " : prep_time = " << prepare_duration
-                           << ", lon_acc = " << sampled_longitudinal_acc);
-      };
+        RCLCPP_DEBUG(logger_, "  -  %s : prep_time = %.5f 2, lon_acc = %.5f", s, prepare_duration, sampled_longitudinal_acc);
+      }; 3
 
       // get path on original lanes
       const auto prepare_velocity = std::clamp(
@@ -1419,6 +1417,10 @@ bool NormalLaneChange::getLaneChangePaths(
 
       const auto prepare_length = utils::lane_change::calcPhaseLength(
         current_velocity, getCommonParam().max_vel, longitudinal_acc_on_prepare, prepare_duration);
+
+      if(prepare_length > (dist_to_end_of_current_lanes - lane_change_buffer)){
+        continue;
+      }
 
       auto prepare_segment = getPrepareSegment(current_lanes, backward_path_length, prepare_length);
 
@@ -1459,9 +1461,9 @@ bool NormalLaneChange::getLaneChangePaths(
 
       for (const auto & lateral_acc : sample_lat_acc) {
         const auto debug_print_lat = [&](const auto & s) {
-          RCLCPP_DEBUG_STREAM(
-            logger_, "    -  " << s << " : prep_time = " << prepare_duration << ", lon_acc = "
-                               << sampled_longitudinal_acc << ", lat_acc = " << lateral_acc);
+          RCLCPP_DEBUG(
+            logger_, "  -  %s : prep_time = %.5f, lon_acc = %.5f, lat_acc = %5f", s, prepare_duration,
+            sampled_longitudinal_acc, lateral_acc);
         };
 
         const auto lane_changing_time = PathShifter::calcShiftTimeFromJerk(
@@ -1470,6 +1472,13 @@ bool NormalLaneChange::getLaneChangePaths(
           utils::lane_change::calcLaneChangingAcceleration(
             initial_lane_changing_velocity, max_path_velocity, lane_changing_time,
             sampled_longitudinal_acc);
+
+        if(!candidate_paths->empty()){
+          const  auto lon_lc_acc_diff = candidate_paths->back().info.longitudinal_acceleration.lane_changing - longitudinal_acc_on_lane_changing;
+          if(std::abs(lon_lc_acc_diff) < 0.1){
+            continue;
+          }
+        }
         const auto lane_changing_length = utils::lane_change::calcPhaseLength(
           initial_lane_changing_velocity, getCommonParam().max_vel,
           longitudinal_acc_on_lane_changing, lane_changing_time);
