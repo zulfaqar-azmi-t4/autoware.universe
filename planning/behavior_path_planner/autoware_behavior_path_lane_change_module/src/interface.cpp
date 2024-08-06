@@ -296,7 +296,7 @@ bool LaneChangeInterface::canTransitFailureState()
     if (post_process_safety_status_.is_safe) {
       log_debug_throttled("Can't transit to failure state. Ego is on prepare, and it's safe.");
 
-      if (module_type_->isRequiredStop(post_process_safety_status_.is_object_coming_from_rear)) {
+      if (module_type_->isRequiredStop(post_process_safety_status_.is_trailing_object)) {
         log_debug_throttled("Module require stopping");
       }
 
