@@ -24,6 +24,7 @@ using autoware::route_handler::Direction;
 using autoware::route_handler::RouteHandler;
 using behavior_path_planner::lane_change::CommonDataPtr;
 using behavior_path_planner::lane_change::LCParamPtr;
+using behavior_path_planner::lane_change::RouteHandlerPtr;
 
 /**
  * @brief Calculates the distance from the ego vehicle to the terminal point.
@@ -115,18 +116,20 @@ double calc_maximum_prepare_length(const CommonDataPtr & common_data_ptr);
  * or numeric_limits<double>::max() if the target lanes are empty or data is unavailable.
  */
 double calc_ego_dist_to_lanes_start(
-  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & current_lanes,
-  const lanelet::ConstLanelets & target_lanes);
+  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & target_lanes);
 
-double calc_minimum_lane_change_length(
-  const LaneChangeParameters & lane_change_parameters, const std::vector<double> & shift_intervals);
+double calc_lane_change_buffer(
+  const CommonDataPtr & common_data_ptr, const lanelet::ConstLanelets & lanes);
 
-double calc_minimum_lane_change_length(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelet & lane,
-  const LaneChangeParameters & lane_change_parameters, Direction direction);
+double calc_lane_change_buffer(
+  const LCParamPtr & lc_param_ptr, const std::vector<double> & shift_intervals);
+
+// double calc_minimum_lane_change_length(
+//   const RouteHandlerPtr & route_handler, const lanelet::ConstLanelet & lane,
+//   const LCParamPtr & lc_param_ptr, Direction direction);
 
 double calc_maximum_lane_change_length(
-  const double current_velocity, const LaneChangeParameters & lane_change_parameters,
+  const double current_velocity, const LCParamPtr & lc_param_ptr,
   const std::vector<double> & shift_intervals, const double max_acc);
 
 double calc_maximum_lane_change_length(

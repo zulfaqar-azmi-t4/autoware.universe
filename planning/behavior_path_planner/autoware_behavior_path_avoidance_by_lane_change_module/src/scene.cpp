@@ -41,6 +41,7 @@ using autoware::behavior_path_planner::LaneChangeModuleType;
 using autoware::behavior_path_planner::ObjectInfo;
 using autoware::behavior_path_planner::Point2d;
 using autoware::behavior_path_planner::utils::lane_change::debug::createExecutionArea;
+namespace calculation = utils::lane_change::calculation;
 
 AvoidanceByLaneChange::AvoidanceByLaneChange(
   const std::shared_ptr<LaneChangeParameters> & parameters,
@@ -82,7 +83,8 @@ bool AvoidanceByLaneChange::specialRequiredCheck() const
 
   const auto & nearest_object = data.target_objects.front();
   const auto minimum_avoid_length = calcMinAvoidanceLength(nearest_object);
-  const auto minimum_lane_change_length = calcMinimumLaneChangeLength();
+  const auto minimum_lane_change_length =
+    calculation::calc_lane_change_buffer(common_data_ptr_, get_current_lanes());
 
   lane_change_debug_.execution_area = createExecutionArea(
     getCommonParam().vehicle_info, getEgoPose(),
@@ -271,18 +273,6 @@ double AvoidanceByLaneChange::calcMinAvoidanceLength(const ObjectData & nearest_
     nearest_object, utils::static_obstacle_avoidance::isOnRight(nearest_object), avoid_margin);
 
   return avoidance_helper_->getMinAvoidanceDistance(shift_length);
-}
-
-double AvoidanceByLaneChange::calcMinimumLaneChangeLength() const
-{
-  const auto current_lanes = get_current_lanes();
-  if (current_lanes.empty()) {
-    RCLCPP_DEBUG(logger_, "no empty lanes");
-    return std::numeric_limits<double>::infinity();
-  }
-
-  return utils::lane_change::calculation::calc_minimum_lane_change_length(
-    getRouteHandler(), current_lanes.back(), *lane_change_parameters_, direction_);
 }
 
 double AvoidanceByLaneChange::calcLateralOffset() const

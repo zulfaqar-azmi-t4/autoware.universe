@@ -38,6 +38,7 @@ using geometry_msgs::msg::Twist;
 using nav_msgs::msg::Odometry;
 using route_handler::Direction;
 using route_handler::RouteHandler;
+using tier4_planning_msgs::msg::PathWithLaneId;
 using utils::path_safety_checker::ExtendedPredictedObjects;
 
 struct LateralAccelerationMap
@@ -201,6 +202,12 @@ struct Lanes
   std::vector<lanelet::ConstLanelets> preceding_target;
 };
 
+struct PathFromCenterLine
+{
+  PathWithLaneId current;
+  PathWithLaneId target;
+};
+
 struct Info
 {
   PhaseInfo longitudinal_acceleration{0.0, 0.0};
@@ -278,6 +285,7 @@ using BppParamPtr = std::shared_ptr<BehaviorPathPlannerParameters>;
 using LCParamPtr = std::shared_ptr<Parameters>;
 using LanesPtr = std::shared_ptr<Lanes>;
 using LanesPolygonPtr = std::shared_ptr<LanesPolygon>;
+using PathFromCenterLinePtr = std::shared_ptr<PathFromCenterLine>;
 
 struct CommonData
 {
@@ -287,6 +295,7 @@ struct CommonData
   LCParamPtr lc_param_ptr;
   LanesPtr lanes_ptr;
   LanesPolygonPtr lanes_polygon_ptr;
+  PathFromCenterLinePtr path_from_centerline_ptr;
   ModuleType lc_type;
   Direction direction;
 
@@ -304,8 +313,32 @@ struct CommonData
     const auto y = get_ego_twist().linear.y;
     return std::hypot(x, y);
   }
+
+  bool is_data_available()
+  {
+    return route_handler_ptr || self_odometry_ptr || bpp_param_ptr || lc_param_ptr || lanes_ptr ||
+           lanes_polygon_ptr || path_from_centerline_ptr;
+  }
+
+  bool lanes_available()
+  {
+    return lanes_ptr || !lanes_ptr->current.empty() || !lanes_ptr->target.empty() ||
+           !lanes_ptr->target_neighbor.empty();
+  }
 };
 using CommonDataPtr = std::shared_ptr<CommonData>;
+
+struct TransientData
+{
+  double min_acc{0.0};
+  double max_acc{0.0};
+  double min_lc_buffer{0.0};       // minimum lane change length calculated from current lane
+  double next_min_lc_buffer{0.0};  // minimum lane change length calculated from target lane;
+  double max_lane_changing_length{
+    0.0};  // maximum lane changing length which doesn't include prepare length;
+  double dist_ego_to_current_terminal_end{0.0};
+  double dist_ego_to_target_start{0.0};
+};
 }  // namespace autoware::behavior_path_planner::lane_change
 
 namespace autoware::behavior_path_planner

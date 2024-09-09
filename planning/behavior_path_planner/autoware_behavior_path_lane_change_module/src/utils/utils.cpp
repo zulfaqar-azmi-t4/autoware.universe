@@ -543,24 +543,25 @@ double getLateralShift(const LaneChangePath & path)
 }
 
 bool hasEnoughLengthToLaneChangeAfterAbort(
-  const std::shared_ptr<RouteHandler> & route_handler, const lanelet::ConstLanelets & current_lanes,
-  const Pose & current_pose, const double abort_return_dist,
-  const LaneChangeParameters & lane_change_parameters, const Direction direction)
+  const CommonDataPtr & common_data_ptr, const double abort_return_dist)
 {
-  if (current_lanes.empty()) {
+  if (!common_data_ptr->lanes_available()) {
     return false;
   }
 
-  const auto minimum_lane_change_length = calculation::calc_minimum_lane_change_length(
-    route_handler, current_lanes.back(), lane_change_parameters, direction);
+  const auto & route_handler_ptr = common_data_ptr->route_handler_ptr;
+  const auto & current_lanes = common_data_ptr->lanes_ptr->current;
+  const auto minimum_lane_change_length = calculation::calc_lane_change_buffer(common_data_ptr, current_lanes);
   const auto abort_plus_lane_change_length = abort_return_dist + minimum_lane_change_length;
+
+  const auto & current_pose = common_data_ptr->get_ego_pose();
   if (abort_plus_lane_change_length > utils::getDistanceToEndOfLane(current_pose, current_lanes)) {
     return false;
   }
 
   if (
     abort_plus_lane_change_length >
-    utils::getSignedDistance(current_pose, route_handler->getGoalPose(), current_lanes)) {
+    utils::getSignedDistance(current_pose, route_handler_ptr->getGoalPose(), current_lanes)) {
     return false;
   }
 
