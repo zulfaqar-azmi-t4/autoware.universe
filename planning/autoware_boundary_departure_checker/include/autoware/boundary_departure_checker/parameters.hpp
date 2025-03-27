@@ -34,9 +34,23 @@ namespace autoware::lane_departure_checker
 using autoware_planning_msgs::msg::LaneletRoute;
 using autoware_planning_msgs::msg::Trajectory;
 using autoware_planning_msgs::msg::TrajectoryPoint;
-using autoware_utils::PoseDeviation;
 using TrajectoryPoints = std::vector<TrajectoryPoint>;
 using autoware_utils::LinearRing2d;
+using autoware_utils::Point2d;
+
+struct Projection
+{
+  Point2d orig;
+  Point2d proj;
+  double dist{std::numeric_limits<double>::max()};
+};
+
+template <typename T>
+struct Sides
+{
+  T left;
+  T right;
+};
 
 struct Param
 {
