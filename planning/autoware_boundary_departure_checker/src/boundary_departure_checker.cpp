@@ -95,8 +95,21 @@ Output LaneDepartureChecker::update(const Input & input)
     }
     return footprints;
   });
-
   output.processing_time_map["createVehicleFootprints"] = stop_watch.toc(true);
+
+  std::vector<FootPrintSides> footprints;
+
+  for(const auto & fp : output.vehicle_footprints){
+    FootPrintSides footprint_side;
+    footprint_side.front = {
+      Point2d(fp.at(0).x(), fp.at(0).y()), Point2d(fp.at(1).x(), fp.at(1).y())};
+    footprint_side.right = {
+      Point2d(fp.at(1).x(), fp.at(1).y()), Point2d(fp.at(3).x(), fp.at(3).y())};
+    footprint_side.left = {
+      Point2d(fp.at(6).x(), fp.at(6).y()), Point2d(fp.at(4).x(), fp.at(4).y())};
+    footprint_side.rear = {
+      Point2d(fp.at(3).x(), fp.at(3).y()), Point2d(fp.at(4).x(), fp.at(4).y())};
+  }
 
   output.vehicle_passing_areas = utils::createVehiclePassingAreas(output.vehicle_footprints);
   output.processing_time_map["createVehiclePassingAreas"] = stop_watch.toc(true);

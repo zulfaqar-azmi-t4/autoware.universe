@@ -60,50 +60,56 @@ namespace autoware::lane_departure_checker::utils
 {
   using lane_departure_checker::Projection;
   using autoware_utils::Segment2d;
-TrajectoryPoints cutTrajectory(const TrajectoryPoints & trajectory, const double length)
-{
-  if (trajectory.empty()) {
-    return {};
-  }
+  using SegmentWithIdx = std::pair<Segment2d, lanelet::Id>;
+  namespace bg = boost::geometry;
+  namespace bgi = bg::index;
+  using SegmentWithIdxRtree =
+    boost::geometry::index::rtree<SegmentWithIdx, bgi::rstar<16>>;
 
-  TrajectoryPoints cut;
-
-  double total_length = 0.0;
-  auto last_point = autoware_utils::from_msg(trajectory.front().pose.position);
-  auto end_it = std::next(trajectory.cbegin());
-  for (; end_it != trajectory.cend(); ++end_it) {
-    const auto remain_distance = length - total_length;
-
-    // Over length
-    if (remain_distance <= 0) {
-      break;
+  TrajectoryPoints cutTrajectory(const TrajectoryPoints & trajectory, const double length)
+  {
+    if (trajectory.empty()) {
+      return {};
     }
 
-    const auto & new_pose = end_it->pose;
-    const auto new_point = autoware_utils::from_msg(new_pose.position);
-    const auto points_distance = boost::geometry::distance(last_point.to_2d(), new_point.to_2d());
+    TrajectoryPoints cut;
 
-    // Require interpolation
-    if (remain_distance <= points_distance) {
-      const Eigen::Vector3d p_interpolated =
-        last_point + remain_distance * (new_point - last_point).normalized();
+    double total_length = 0.0;
+    auto last_point = autoware_utils::from_msg(trajectory.front().pose.position);
+    auto end_it = std::next(trajectory.cbegin());
+    for (; end_it != trajectory.cend(); ++end_it) {
+      const auto remain_distance = length - total_length;
 
-      TrajectoryPoint p;
-      p.pose.position.x = p_interpolated.x();
-      p.pose.position.y = p_interpolated.y();
-      p.pose.position.z = p_interpolated.z();
-      p.pose.orientation = new_pose.orientation;
+      // Over length
+      if (remain_distance <= 0) {
+        break;
+      }
 
-      cut.push_back(p);
-      break;
+      const auto & new_pose = end_it->pose;
+      const auto new_point = autoware_utils::from_msg(new_pose.position);
+      const auto points_distance = boost::geometry::distance(last_point.to_2d(), new_point.to_2d());
+
+      // Require interpolation
+      if (remain_distance <= points_distance) {
+        const Eigen::Vector3d p_interpolated =
+          last_point + remain_distance * (new_point - last_point).normalized();
+
+        TrajectoryPoint p;
+        p.pose.position.x = p_interpolated.x();
+        p.pose.position.y = p_interpolated.y();
+        p.pose.position.z = p_interpolated.z();
+        p.pose.orientation = new_pose.orientation;
+
+        cut.push_back(p);
+        break;
+      }
+
+      total_length += points_distance;
+      last_point = new_point;
     }
+    cut.insert(cut.begin(), trajectory.begin(), end_it);
 
-    total_length += points_distance;
-    last_point = new_point;
-  }
-  cut.insert(cut.begin(), trajectory.begin(), end_it);
-
-  return cut;
+    return cut;
 }
 
 TrajectoryPoints resampleTrajectory(const Trajectory & trajectory, const double interval)
@@ -286,7 +292,7 @@ std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> get_nearby_uncrossab
   return uncrossable_boundaries;
 }
 
-std::optional<Projection> point_to_segment_signed_projection(
+std::optional<Projection> point_to_segment_projection(
   const Point2d & p, const Segment2d & segment, const bool swap_points = false)
 {
   const auto & p1 = segment.first;
@@ -295,23 +301,23 @@ std::optional<Projection> point_to_segment_signed_projection(
   const Point2d p2_vec = {p2.x() - p1.x(), p2.y() - p1.y()};
   const Point2d p_vec = {p.x() - p1.x(), p.y() - p1.y()};
 
-  const auto result = [&swap_points](
-                        const Point2d & orig, const Point2d & proj, const double dist) {
-    return swap_points ? Projection{proj, orig, dist} : Projection{orig, proj, dist};
+  const auto result = [&swap_points](const Point2d & orig, const Point2d & proj) {
+    return swap_points ? Projection{proj, orig, boost::geometry::distance(proj, orig)}
+                       : Projection{orig, proj, boost::geometry::distance(orig, proj)};
   };
 
   const auto c1 = boost::geometry::dot_product(p_vec, p2_vec);
   if (c1 < 0.0) return std::nullopt;
-  if (c1 == 0.0) return result(p, p1, boost::geometry::distance(p, p1));
+  if (c1 == 0.0) return result(p, p1);
 
   const auto c2 = boost::geometry::dot_product(p2_vec, p2_vec);
   if (c1 > c2) return std::nullopt;
 
-  if (c1 == c2) return result(p, p2, boost::geometry::distance(p, p2));
+  if (c1 == c2) return result(p, p2);
 
   const auto projection = p1 + (p2_vec * c1 / c2);
   const auto projection_point = Point2d{projection.x(), projection.y()};
-  return result(p, projection_point, boost::geometry::distance(p, projection_point));
+  return result(p, projection_point);
 }
 
 std::optional<Projection> segment_to_segment_nearest_projection(
@@ -319,24 +325,24 @@ std::optional<Projection> segment_to_segment_nearest_projection(
 {
   std::vector<Projection> projections;
 
-  if (const auto projection_opt = point_to_segment_signed_projection(ego_seg.first, lane_seg)) {
-    projections.push_back(*projection_opt);
-  }
-
-  if (const auto projection_opt = point_to_segment_signed_projection(ego_seg.second, lane_seg)) {
-    projections.push_back(*projection_opt);
-  }
-
   constexpr bool swap_result = true;
-  if (
-    const auto projection_opt =
-      point_to_segment_signed_projection(lane_seg.first, ego_seg, swap_result)) {
+  if (const auto projection_opt = point_to_segment_projection(ego_seg.first, lane_seg, swap_result)) {
+    projections.push_back(*projection_opt);
+  }
+
+  if (const auto projection_opt = point_to_segment_projection(ego_seg.second, lane_seg, swap_result)) {
     projections.push_back(*projection_opt);
   }
 
   if (
     const auto projection_opt =
-      point_to_segment_signed_projection(lane_seg.second, ego_seg, swap_result)) {
+      point_to_segment_projection(lane_seg.first, ego_seg, !swap_result)) {
+    projections.push_back(*projection_opt);
+  }
+
+  if (
+    const auto projection_opt =
+      point_to_segment_projection(lane_seg.second, ego_seg, !swap_result)) {
     projections.push_back(*projection_opt);
   }
 
@@ -351,19 +357,26 @@ std::optional<Projection> segment_to_segment_nearest_projection(
   return *min_elem;
 }
 
-// SegmentRtree build_rtree(
-//   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries)
-// {
-//   std::vector<SegmentWithIdx> boxes_with_idx;
-//   for (size_t i = 0; i < uncrossable_boundaries.size(); ++i) {
-//     Segment2d segment2d;
-//     bg::envelope(uncrossable_boundaries[i], segment2d);
-//     boxes_with_idx.emplace_back(segment2d, i);
-//   }
-//   return SegmentRtree(boxes_with_idx.begin(), boxes_with_idx.end());
-// }
+SegmentWithIdxRtree build_uncrossable_boundaries_rtree(
+  const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries)
+{
+  std::vector<Segment2d> uncrossable_segments;
 
-// std::optional<std::vector<Projection>> predicted_path_to_lane_boundary_dist(
+  std::vector<SegmentWithIdx> segments;
+  for(const auto & [id, boundary]:uncrossable_boundaries){
+
+    for(size_t i = 0; i < boundary.size() - 1; ++i){
+      const Point2d p1 = {boundary.at(i).x(), boundary.at(i).y()};
+      const Point2d p2 = {boundary.at(i+1).x(), boundary.at(i+1).y()};
+      const Segment2d segment = {p1, p2};
+      segments.emplace_back(bg::return_envelope<Segment2d>(segment), id);
+    }
+  }
+
+  return {segments.begin(), segments.end()};
+}
+
+std::optional<std::vector<Projection>> get_side_near_boundary()
 //   const std::vector<Segment2d> & ego_side_segments,
 //   const std::vector<Segment2d> & lane_side_segments)
 // {
