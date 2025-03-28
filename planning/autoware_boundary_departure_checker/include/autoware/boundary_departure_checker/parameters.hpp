@@ -37,6 +37,8 @@ using autoware_planning_msgs::msg::TrajectoryPoint;
 using TrajectoryPoints = std::vector<TrajectoryPoint>;
 using autoware_utils::LinearRing2d;
 using autoware_utils::Point2d;
+using autoware_utils::Segment2d;
+using geometry_msgs::msg::Point;
 
 struct Projection
 {
@@ -51,6 +53,22 @@ struct Sides
   T left;
   T right;
 };
+
+
+  struct FootPrintSides{
+    Segment2d front;
+    Segment2d rear;
+    Segment2d left;
+    Segment2d right;
+
+    static std::pair<Point, Point> to_geom_pts(const Segment2d & seg, const double height_z) {
+      const auto [p1, p2] = seg;
+      return {autoware_utils::to_msg(p1.to_3d(height_z)), autoware_utils::to_msg(p2.to_3d(height_z))};
+    }
+
+    std::optional<Point2d> intersect(const Segment2d & seg){
+    }
+  };
 
 struct Param
 {
