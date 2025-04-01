@@ -510,6 +510,45 @@ visualization_msgs::msg::MarkerArray LaneDepartureCheckerNode::createMarkerArray
     marker_array.markers.push_back(marker);
   }
 
+  // Vehicle Footprints
+  {
+    const auto color_ok = create_marker_color(0.0, 1.0, 0.0, 0.5);
+
+    auto color = color_ok;
+
+    auto marker = create_default_marker(
+      "map", this->now(), "vehicle_sides", 0, visualization_msgs::msg::Marker::LINE_LIST,
+      create_marker_scale(0.05, 0, 0), color);
+
+    for (const auto & [left, right] : output_.ego_footprints_sides) {
+      marker.points.push_back(autoware_utils::to_msg(left.first.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(left.second.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(right.first.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(right.second.to_3d(base_link_z)));
+    }
+
+    marker_array.markers.push_back(marker);
+  }
+  // Vehicle Footprints
+  {
+    auto color_check = [](const auto distance) {
+      if (distance < -1e-3) return create_marker_color(1.0, 1.0, 0.0, 0.5);
+      if (distance > 1e-3) return create_marker_color(1.0, 0.0, 1.0, 0.5);
+      return create_marker_color(0.0, 1.0, 0.0, 0.5);
+    };
+
+    auto marker = create_default_marker(
+      "map", this->now(), "closest_to_side", 0, visualization_msgs::msg::Marker::LINE_LIST,
+      create_marker_scale(0.05, 0, 0), color_check(0.0));
+
+    for (const auto & [orig, proj, dist] : output_.side_near_boundary) {
+      marker.color = color_check(dist);
+      marker.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
+    }
+
+    marker_array.markers.push_back(marker);
+  }
   return marker_array;
 }
 

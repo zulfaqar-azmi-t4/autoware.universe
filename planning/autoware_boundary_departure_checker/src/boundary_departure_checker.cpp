@@ -22,6 +22,7 @@
 
 #include <boost/geometry.hpp>
 
+#include <fmt/format.h>
 #include <lanelet2_core/geometry/Polygon.h>
 #include <tf2/utils.h>
 
@@ -107,6 +108,12 @@ Output LaneDepartureChecker::update(const Input & input)
     output.ego_footprints_sides.push_back(footprint_side);
   }
 
+  const auto nearest_uncrossable_boundary = utils::get_nearby_uncrossable_boundaries(
+    *input.lanelet_map, input.current_odom->pose.pose.position, 20.0 * 12.0,
+    input.boundary_types_to_detect);
+  fmt::print("Nearest_uncrossable_boundary size is {}\n", nearest_uncrossable_boundary.size());
+  output.side_near_boundary =
+    utils::get_side_near_boundary(output.ego_footprints_sides, nearest_uncrossable_boundary);
   output.vehicle_passing_areas = utils::createVehiclePassingAreas(output.vehicle_footprints);
   output.processing_time_map["createVehiclePassingAreas"] = stop_watch.toc(true);
 

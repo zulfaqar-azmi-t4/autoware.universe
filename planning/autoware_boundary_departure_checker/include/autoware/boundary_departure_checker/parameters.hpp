@@ -56,7 +56,7 @@ struct Side
   T right;
 };
 
-using ProjectionSideOpt = Side<std::optional<Projection>>;
+using SideProjOpt = Side<std::optional<Projection>>;
 using EgoFootprintSide = Side<Segment2d>;
 using EgoFootprintsSides = std::vector<EgoFootprintSide>;
 
@@ -96,6 +96,7 @@ struct Output
   std::vector<LinearRing2d> vehicle_footprints;
   std::vector<LinearRing2d> vehicle_passing_areas;
   EgoFootprintsSides ego_footprints_sides;
+  std::vector<Projection> side_near_boundary;
 };
 }  // namespace autoware::lane_departure_checker
 
