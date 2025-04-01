@@ -123,7 +123,7 @@ std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> get_nearby_uncrossab
   const lanelet::LaneletMap & lanelet_map, const geometry_msgs::msg::Point & point,
   const double search_distance, const std::vector<std::string> & boundary_types_to_detect);
 
-std::vector<Projection> get_side_near_boundary(
+SideToBoundary get_side_near_boundary(
   const EgoFootprintsSides & ego_footprints_sides,
   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries);
 

@@ -321,7 +321,7 @@ std::optional<Projection> point_to_segment_projection(
   const auto direction =
     (p2.x() - p1.x()) * (p.y() - p1.y()) - (p2.y() - p1.y()) * (p.x() - p1.x());
   auto projected = result(p, projection_point);
-  projected.dist = std::copysign(projected.dist, direction) * (swap_points ? -1.0 : 1.0);
+  projected.dist = std::copysign(projected.dist, direction);
   return projected;
 }
 
@@ -363,6 +363,36 @@ std::optional<Projection> segment_to_segment_nearest_projection(
     });
 
   return *min_elem;
+}
+
+std::optional<Projection> get_left_dist_to_boundary(
+  const Segment2d & ego_left, const Segment2d & boundary_segment)
+{
+  auto left_opt = segment_to_segment_nearest_projection(ego_left, boundary_segment);
+
+  if (!left_opt) return std::nullopt;
+
+  // If projection is clearly on the right of the segment, discard
+  if (std::abs(left_opt->dist) >= 1e-3 && !std::signbit(left_opt->dist)) {
+    return std::nullopt;
+  }
+
+  return left_opt;
+}
+
+std::optional<Projection> get_right_dist_to_boundary(
+  const Segment2d & ego_right, const Segment2d & boundary_segment)
+{
+  auto right_opt = segment_to_segment_nearest_projection(ego_right, boundary_segment);
+
+  if (!right_opt) return std::nullopt;
+
+  // If projection is clearly on the left of the segment, discard
+  if (std::abs(right_opt->dist) >= 1e-3 && std::signbit(right_opt->dist)) {
+    return std::nullopt;
+  }
+
+  return right_opt;
 }
 
 std::optional<Projection> get_dist_to_boundaries(
@@ -429,7 +459,7 @@ SegmentWithIdxRtree build_uncrossable_boundaries_rtree(
   return {segments.begin(), segments.end()};
 }
 
-std::vector<Projection> get_side_near_boundary(
+SideToBoundary get_side_near_boundary(
   const EgoFootprintsSides & ego_footprints_sides,
   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries)
 {
@@ -442,7 +472,9 @@ std::vector<Projection> get_side_near_boundary(
     return {};
   }
 
-  std::vector<Projection> side_near_boundary;
+  SideToBoundary side_near_boundary;
+
+
   for (const auto & side : ego_footprints_sides) {
     constexpr auto num_of_nearest = 20;
     std::vector<SegmentWithIdx> nearest_segments;
@@ -453,8 +485,12 @@ std::vector<Projection> get_side_near_boundary(
 
     std::unordered_set<std::pair<lanelet::Id, size_t>> seen;
 
-    std::vector<Projection> closest_points_to_boundaries;
-    closest_points_to_boundaries.reserve(nearest_segments.size());
+    std::vector<Projection> left_projections;
+    std::vector<Projection> right_projections;
+
+    left_projections.reserve(nearest_segments.size());
+    right_projections.reserve(nearest_segments.size());
+
     for (const auto & [lane_bbox, lane_id, idx] : nearest_segments) {
       const auto id = std::make_pair(lane_id, idx);
       if (seen.find(id) != seen.end()) {
@@ -462,17 +498,26 @@ std::vector<Projection> get_side_near_boundary(
       }
 
       seen.insert(id);
-      if (const auto projected_opt = get_dist_to_boundaries(side, lane_bbox)) {
-        closest_points_to_boundaries.push_back(*projected_opt);
+      if (const auto projected_opt = get_left_dist_to_boundary(side.left, lane_bbox)) {
+        left_projections.push_back(*projected_opt);
+      }
+
+      if (const auto projected_opt = get_right_dist_to_boundary(side.right, lane_bbox)) {
+        right_projections.push_back(*projected_opt);
       }
     }
-    const auto min_elem = std::min_element(
-      closest_points_to_boundaries.begin(), closest_points_to_boundaries.end(),
-      [](const Projection & proj1, const Projection & proj2) {
-        return std::abs(proj1.dist) < std::abs(proj2.dist);
-      });
-    if (min_elem != closest_points_to_boundaries.end()) {
-      side_near_boundary.push_back(*min_elem);
+    const auto get_min = [](const Projection & proj1, const Projection & proj2) {
+      return std::abs(proj1.dist) < std::abs(proj2.dist);
+    };
+
+    const auto min_left_elem = std::min_element(left_projections.begin(), left_projections.end(), get_min);
+    if (min_left_elem != left_projections.end()) {
+      side_near_boundary.left.push_back(*min_left_elem);
+    }
+    const auto min_right_elem =
+      std::min_element(right_projections.begin(), right_projections.end(), get_min);
+    if (min_right_elem != right_projections.end()) {
+      side_near_boundary.right.push_back(*min_right_elem);
     }
   }
 
