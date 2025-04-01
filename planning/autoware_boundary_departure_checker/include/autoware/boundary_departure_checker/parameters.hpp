@@ -16,6 +16,7 @@
 #define AUTOWARE__BOUNDARY_DEPARTURE_CHECKER__PARAMETERS_HPP_
 
 #include <autoware_utils/geometry/boost_geometry.hpp>
+#include <autoware_utils/geometry/geometry.hpp>
 #include <autoware_utils/geometry/pose_deviation.hpp>
 
 #include <autoware_planning_msgs/msg/lanelet_route.hpp>
@@ -26,6 +27,7 @@
 #include <lanelet2_core/LaneletMap.h>
 
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -48,27 +50,15 @@ struct Projection
 };
 
 template <typename T>
-struct Sides
+struct Side
 {
   T left;
   T right;
 };
 
-
-  struct FootPrintSides{
-    Segment2d front;
-    Segment2d rear;
-    Segment2d left;
-    Segment2d right;
-
-    static std::pair<Point, Point> to_geom_pts(const Segment2d & seg, const double height_z) {
-      const auto [p1, p2] = seg;
-      return {autoware_utils::to_msg(p1.to_3d(height_z)), autoware_utils::to_msg(p2.to_3d(height_z))};
-    }
-
-    std::optional<Point2d> intersect(const Segment2d & seg){
-    }
-  };
+using ProjectionSideOpt = Side<std::optional<Projection>>;
+using EgoFootprintSide = Side<Segment2d>;
+using EgoFootprintsSides = std::vector<EgoFootprintSide>;
 
 struct Param
 {
@@ -105,6 +95,7 @@ struct Output
   TrajectoryPoints resampled_trajectory;
   std::vector<LinearRing2d> vehicle_footprints;
   std::vector<LinearRing2d> vehicle_passing_areas;
+  EgoFootprintsSides ego_footprints_sides;
 };
 }  // namespace autoware::lane_departure_checker
 
