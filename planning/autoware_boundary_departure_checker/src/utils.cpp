@@ -14,13 +14,12 @@
 
 #include "autoware/boundary_departure_checker/utils.hpp"
 
-#include "autoware/boundary_departure_checker/parameters.hpp"
-
 #include <autoware/motion_utils/trajectory/trajectory.hpp>
 #include <autoware_utils/geometry/geometry.hpp>
 
 #include <boost/geometry.hpp>
 
+#include <fmt/format.h>
 #include <lanelet2_core/geometry/Polygon.h>
 
 #include <utility>
@@ -62,7 +61,7 @@ namespace autoware::lane_departure_checker::utils
 {
 using autoware_utils::Segment2d;
 using lane_departure_checker::Projection;
-using SegmentWithIdx = std::pair<Segment2d, lanelet::Id>;
+using SegmentWithIdx = std::tuple<Segment2d, lanelet::Id, size_t>;
 namespace bg = boost::geometry;
 namespace bgi = bg::index;
 using SegmentWithIdxRtree = boost::geometry::index::rtree<SegmentWithIdx, bgi::rstar<16>>;
@@ -319,11 +318,11 @@ std::optional<Projection> point_to_segment_projection(
   const auto projection = p1 + (p2_vec * c1 / c2);
   const auto projection_point = Point2d{projection.x(), projection.y()};
 
-
-  const auto check_sign = [&](){
-    return (p2.x() - p1.x()) * (p.y() - p1.y()) - (p2.y() - p1.y())*(p.x() - p1.x());
-  };
-  return result(p, projection_point);
+  const auto direction =
+    (p2.x() - p1.x()) * (p.y() - p1.y()) - (p2.y() - p1.y()) * (p.x() - p1.x());
+  auto projected = result(p, projection_point);
+  projected.dist = std::copysign(projected.dist, direction) * (swap_points ? -1.0 : 1.0);
+  return projected;
 }
 
 std::optional<Projection> segment_to_segment_nearest_projection(
@@ -366,16 +365,50 @@ std::optional<Projection> segment_to_segment_nearest_projection(
   return *min_elem;
 }
 
-ProjectionSideOpt get_dist_to_boundaries(
+std::optional<Projection> get_dist_to_boundaries(
   const EgoFootprintSide & ego_footprint_side, const Segment2d & boundary_segment)
 {
-  const auto left_opt = segment_to_segment_nearest_projection(ego_footprint_side.left, boundary_segment);
-  const auto right_opt = segment_to_segment_nearest_projection(ego_footprint_side.right, boundary_segment);
+  auto left_opt = segment_to_segment_nearest_projection(ego_footprint_side.left, boundary_segment);
+  auto right_opt =
+    segment_to_segment_nearest_projection(ego_footprint_side.right, boundary_segment);
 
-
-  if(left_opt && right_opt){
-    if(std::signbit(left_opt->dist) == std::signbit(right_opt->dist))
+  if (!left_opt && !right_opt) {
+    return std::nullopt;
   }
+
+  if (left_opt && !right_opt) {
+    if (std::abs(left_opt->dist) >= 1e-3 && !std::signbit(left_opt->dist)) {
+      return std::nullopt;
+    }
+    return left_opt;
+  }
+
+  if (right_opt && !left_opt) {
+    if (std::abs(right_opt->dist) >= 1e-3 && std::signbit(right_opt->dist)) {
+      return std::nullopt;
+    }
+    return right_opt;
+  }
+
+  if (std::abs(right_opt->dist) < 1e-3) {
+    return right_opt;
+  }
+
+  if (std::abs(left_opt->dist) < 1e-3) {
+    return left_opt;
+  }
+
+  if (std::signbit(left_opt->dist) && std::signbit(right_opt->dist)) {
+    fmt::print("left: {:.3f}, right: {:.3f}. Return left\n", left_opt->dist, right_opt->dist);
+    return left_opt;
+  }
+  if (!std::signbit(left_opt->dist) && !std::signbit(right_opt->dist)) {
+    fmt::print("left: {:.3f}, right: {:.3f}. Return right\n", left_opt->dist, right_opt->dist);
+    return right_opt;
+  }
+
+  fmt::print("left: {:.3f}, right: {:.3f}. Neutral\n", left_opt->dist, right_opt->dist);
+  return right_opt;
 }
 
 SegmentWithIdxRtree build_uncrossable_boundaries_rtree(
@@ -389,67 +422,60 @@ SegmentWithIdxRtree build_uncrossable_boundaries_rtree(
       const Point2d p1 = {boundary.at(i).x(), boundary.at(i).y()};
       const Point2d p2 = {boundary.at(i + 1).x(), boundary.at(i + 1).y()};
       const Segment2d segment = {p1, p2};
-      segments.emplace_back(bg::return_envelope<Segment2d>(segment), id);
+      segments.emplace_back(bg::return_envelope<Segment2d>(segment), id, i);
     }
   }
 
   return {segments.begin(), segments.end()};
 }
 
-std::optional<std::vector<Projection>> get_side_near_boundary(
+std::vector<Projection> get_side_near_boundary(
   const EgoFootprintsSides & ego_footprints_sides,
   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries)
 {
   if (ego_footprints_sides.empty() || uncrossable_boundaries.empty()) {
-    return std::nullopt;
+    return {};
   }
 
   const auto rtree_bbox = build_uncrossable_boundaries_rtree(uncrossable_boundaries);
   if (rtree_bbox.empty()) {
-    return std::nullopt;
+    return {};
   }
 
-  for (const auto & seg : ego_footprints_sides) {
-    constexpr auto num_of_nearest = 5;
+  std::vector<Projection> side_near_boundary;
+  for (const auto & side : ego_footprints_sides) {
+    constexpr auto num_of_nearest = 20;
     std::vector<SegmentWithIdx> nearest_segments;
     nearest_segments.reserve(num_of_nearest);  // ✅ Preallocate space
-    rtree_bbox.query(bgi::nearest(seg, num_of_nearest), std::back_inserter(nearest_segments));
+    rtree_bbox.query(bgi::nearest(side.left, num_of_nearest), std::back_inserter(nearest_segments));
+    rtree_bbox.query(
+      bgi::nearest(side.right, num_of_nearest), std::back_inserter(nearest_segments));
 
-    for (const auto & [lane_bbox, idx] : nearest_segments) {
-    }
+    std::unordered_set<std::pair<lanelet::Id, size_t>> seen;
 
-    if (min_projection_opt) {
-      projections.emplace_back(*min_projection_opt);
-    } else {
-      std::optional<Projection> min_lane_projection_opt;
-      std::vector<SegmentWithIdx> nearest_route_segments;
-      nearest_route_segments.reserve(num_of_nearest);  // ✅ Preallocate space
-      rtree_bbox.query(
-        bgi::nearest(seg, num_of_nearest), std::back_inserter(nearest_route_segments));
-      for (const auto & [lane_bbox, idx] : nearest_route_segments) {
-        const auto intersect_with_route = autoware_utils::intersect(
-          autoware_utils::to_msg(seg.first.to_3d()), autoware_utils::to_msg(seg.second.to_3d()),
-          autoware_utils::to_msg(lane_side_segments[idx].first.to_3d()),
-          autoware_utils::to_msg(lane_side_segments[idx].second.to_3d()));
-        if (intersect_with_route) {
-          if (
-            autoware_utils::calc_distance2d(
-              autoware_utils::to_msg(seg.second.to_3d()), *intersect_with_route) >
-            autoware_utils::calc_distance2d(
-              autoware_utils::to_msg(seg.second.to_3d()), prev_intersect)) {
-            prev_intersect = *intersect_with_route;
-          }
-        }
-        const auto curr_projection =
-          segment_to_segment_nearest_projection(seg, lane_side_segments[idx]);
-        if (
-          !min_lane_projection_opt ||
-          std::abs(min_projection_opt->dist) > std::abs(curr_projection.distance)) {
-          min_projection_opt = curr_projection;
-        }
+    std::vector<Projection> closest_points_to_boundaries;
+    closest_points_to_boundaries.reserve(nearest_segments.size());
+    for (const auto & [lane_bbox, lane_id, idx] : nearest_segments) {
+      const auto id = std::make_pair(lane_id, idx);
+      if (seen.find(id) != seen.end()) {
+        continue;
+      }
+
+      seen.insert(id);
+      if (const auto projected_opt = get_dist_to_boundaries(side, lane_bbox)) {
+        closest_points_to_boundaries.push_back(*projected_opt);
       }
     }
+    const auto min_elem = std::min_element(
+      closest_points_to_boundaries.begin(), closest_points_to_boundaries.end(),
+      [](const Projection & proj1, const Projection & proj2) {
+        return std::abs(proj1.dist) < std::abs(proj2.dist);
+      });
+    if (min_elem != closest_points_to_boundaries.end()) {
+      side_near_boundary.push_back(*min_elem);
+    }
   }
-  return projections;
+
+  return side_near_boundary;
 }
 }  // namespace autoware::lane_departure_checker::utils

@@ -15,6 +15,8 @@
 #ifndef AUTOWARE__BOUNDARY_DEPARTURE_CHECKER__UTILS_HPP_
 #define AUTOWARE__BOUNDARY_DEPARTURE_CHECKER__UTILS_HPP_
 
+#include "autoware/boundary_departure_checker/parameters.hpp"
+
 #include <autoware_utils/geometry/boost_geometry.hpp>
 #include <autoware_utils/geometry/pose_deviation.hpp>
 #include <autoware_vehicle_info_utils/vehicle_info.hpp>
@@ -116,6 +118,15 @@ std::vector<LinearRing2d> createVehiclePassingAreas(
  */
 double calcMaxSearchLengthForBoundaries(
   const Trajectory & trajectory, const autoware::vehicle_info_utils::VehicleInfo & vehicle_info);
+
+std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> get_nearby_uncrossable_boundaries(
+  const lanelet::LaneletMap & lanelet_map, const geometry_msgs::msg::Point & point,
+  const double search_distance, const std::vector<std::string> & boundary_types_to_detect);
+
+std::vector<Projection> get_side_near_boundary(
+  const EgoFootprintsSides & ego_footprints_sides,
+  const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries);
+
 }  // namespace autoware::lane_departure_checker::utils
 
 #endif  // AUTOWARE__BOUNDARY_DEPARTURE_CHECKER__UTILS_HPP_
