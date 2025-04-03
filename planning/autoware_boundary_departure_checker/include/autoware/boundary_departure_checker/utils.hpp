@@ -122,7 +122,9 @@ double calcMaxSearchLengthForBoundaries(
 std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> get_nearby_uncrossable_boundaries(
   const lanelet::LaneletMap & lanelet_map, const geometry_msgs::msg::Point & point,
   const double search_distance, const std::vector<std::string> & boundary_types_to_detect);
-
+SideToBoundary get_closest_boundary_from_side(
+  const lanelet::LaneletMap & lanelet_map, const EgoFootprintsSides & ego_footprints_sides,
+  const std::vector<std::string> & boundary_types_to_detect);
 SideToBoundary get_side_near_boundary(
   const EgoFootprintsSides & ego_footprints_sides,
   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries);
