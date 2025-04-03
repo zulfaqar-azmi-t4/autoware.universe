@@ -307,22 +307,22 @@ std::optional<Projection> point_to_segment_projection(
   };
 
   const auto c1 = boost::geometry::dot_product(p_vec, p2_vec);
-  if (c1 < 0.0) return std::nullopt;
-  if (c1 == 0.0) return result(p, p1);
+  // if (c1 < 0.0) return std::nullopt;
+  if (c1 <= 0.0) return result(p, p1);
 
   const auto c2 = boost::geometry::dot_product(p2_vec, p2_vec);
-  if (c1 > c2) return std::nullopt;
+  // if (c1 > c2) return std::nullopt;
 
-  if (c1 == c2) return result(p, p2);
+  if (c1 >= c2) return result(p, p2);
 
   const auto projection = p1 + (p2_vec * c1 / c2);
   const auto projection_point = Point2d{projection.x(), projection.y()};
 
-  const auto direction =
-    (p2.x() - p1.x()) * (p.y() - p1.y()) - (p2.y() - p1.y()) * (p.x() - p1.x());
-  auto projected = result(p, projection_point);
-  projected.dist = std::copysign(projected.dist, direction);
-  return projected;
+  // const auto direction =
+  //   (p2.x() - p1.x()) * (p.y() - p1.y()) - (p2.y() - p1.y()) * (p.x() - p1.x());
+  return result(p, projection_point);
+  // projected.dist = std::copysign(projected.dist, direction);
+  // return projected;
 }
 
 std::optional<Projection> segment_to_segment_nearest_projection(
@@ -470,20 +470,56 @@ SideToBoundary get_closest_boundary_from_side(
     return (type != no_type && std::find(types.begin(), types.end(), type) != types.end());
   };
 
-  for (const auto & [left, right] : ego_footprints_sides) {
+  SideToBoundary side;
+  for (const auto & sides : ego_footprints_sides) {
+    const auto & left = sides.left;
     Side<std::pair<lanelet::ConstLineString3d, double>> closest_ls;
+    closest_ls.left.second = std::numeric_limits<double>::max();
     const lanelet::BasicPoint2d left_front{left.first.x(), left.first.y()};
-    const auto closest_left = lanelet_map.lineStringLayer.nearestUntil(left_front, [&](const auto & bbox, const auto & ls){
-      if(lanelet::geometry::distance2d(bbox, left_front) > closest_ls.left.second){
-        return true;
-      }
-      const double dist = lanelet::geometry::distance2d(left, ls);
-      if(is_uncrossable_type(ls) && dist < closest_ls.left.second){
-        closest_ls.left = {ls, dist};
-      }
-      return false;
-    });
+    const lanelet::BasicSegment2d seg{left.first, left.second};
+    std::optional<Projection> proj;
+    const auto closest_left = lanelet_map.lineStringLayer.nearestUntil(
+      left_front, [&](const auto & bbox, const lanelet::ConstLineString3d & ls) {
+        if (!is_uncrossable_type(ls)) {
+          return false;
+        }
+
+        const auto bbox_dist = lanelet::geometry::distance2d(bbox, left_front);
+        if (bbox_dist > closest_ls.left.second) {
+          return true;
+        }
+
+        const double dist = lanelet::geometry::distance2d(seg, ls.basicLineString());
+        if (dist < closest_ls.left.second) {
+          closest_ls.left = {ls, dist};
+          const auto & basic_ls = closest_ls.left.first.basicLineString();
+
+          for (size_t i = 0; i < basic_ls.size() - 1; ++i) {
+            const Point2d p1 = {basic_ls.at(i).x(), basic_ls.at(i).y()};
+            const Point2d p2 = {basic_ls.at(i + 1).x(), basic_ls.at(i + 1).y()};
+            if (const auto projection_opt = segment_to_segment_nearest_projection(left, {p1, p2})) {
+              const auto & [front, back] = left;
+              const auto direction =
+                (back.x() - front.x()) * (projection_opt->orig.y() - front.y()) -
+                (back.y() - front.y()) * (projection_opt->orig.x() - front.x());
+              const auto is_left = std::signbit(direction);
+              if (!is_left) {
+                continue;
+              }
+              if (!proj || projection_opt->dist < proj->dist) {
+                proj = projection_opt;
+              }
+            }
+          }
+        }
+        return false;
+      });
+    if (proj) {
+      side.left.push_back(*proj);
+    }
   }
+  fmt::print("Size of left size {}\n", side.left.size());
+  return side;
 }
 
 SideToBoundary get_side_near_boundary(
@@ -500,7 +536,6 @@ SideToBoundary get_side_near_boundary(
   }
 
   SideToBoundary side_near_boundary;
-
 
   for (const auto & side : ego_footprints_sides) {
     constexpr auto num_of_nearest = 20;
@@ -537,7 +572,8 @@ SideToBoundary get_side_near_boundary(
       return std::abs(proj1.dist) < std::abs(proj2.dist);
     };
 
-    const auto min_left_elem = std::min_element(left_projections.begin(), left_projections.end(), get_min);
+    const auto min_left_elem =
+      std::min_element(left_projections.begin(), left_projections.end(), get_min);
     if (min_left_elem != left_projections.end()) {
       side_near_boundary.left.push_back(*min_left_elem);
     }
