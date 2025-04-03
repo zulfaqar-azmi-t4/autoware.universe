@@ -484,6 +484,7 @@ SideToBoundary get_closest_boundary_from_side(
     const lanelet::BasicPoint2d left_front{left.first.x(), left.first.y()};
     const lanelet::BasicSegment2d seg{left.first, left.second};
     std::optional<Projection> proj;
+    Segment2d proj_bound_seg;
     const auto closest_left = lanelet_map.lineStringLayer.nearestUntil(
       left_front, [&](const auto & bbox, const lanelet::ConstLineString3d & ls) {
         if (!is_uncrossable_type(ls)) {
@@ -492,13 +493,13 @@ SideToBoundary get_closest_boundary_from_side(
 
         const auto bbox_dist = lanelet::geometry::distance2d(bbox, left_front);
         if (bbox_dist > closest_ls.left.second) {
+          fmt::print("bbox_dist = {}, ls dist = {}\n", bbox_dist, closest_ls.left.second);
           return true;
         }
 
         const double dist = lanelet::geometry::distance2d(seg, ls.basicLineString());
         if (dist < closest_ls.left.second) {
-          closest_ls.left = {ls, dist};
-          const auto & basic_ls = closest_ls.left.first.basicLineString();
+          const auto & basic_ls = ls.basicLineString();
 
           for (size_t i = 0; i < basic_ls.size() - 1; ++i) {
             const Point2d p1 = {basic_ls.at(i).x(), basic_ls.at(i).y()};
@@ -513,7 +514,9 @@ SideToBoundary get_closest_boundary_from_side(
                 continue;
               }
               if (!proj || projection_opt->dist < proj->dist) {
+                closest_ls.left = {ls, dist};
                 proj = projection_opt;
+                proj_bound_seg = {p1, p2};
               }
             }
           }
@@ -521,7 +524,7 @@ SideToBoundary get_closest_boundary_from_side(
         return false;
       });
     if (proj) {
-      side.left.push_back(*proj);
+      side.left.emplace_back(*proj, proj_bound_seg);
     }
   }
   fmt::print("Size of left size {}\n", side.left.size());
@@ -553,8 +556,8 @@ SideToBoundary get_side_near_boundary(
 
     std::unordered_set<std::pair<lanelet::Id, size_t>> seen;
 
-    std::vector<Projection> left_projections;
-    std::vector<Projection> right_projections;
+    std::vector<std::pair<Projection, Segment2d>> left_projections;
+    std::vector<std::pair<Projection, Segment2d>> right_projections;
 
     left_projections.reserve(nearest_segments.size());
     right_projections.reserve(nearest_segments.size());
@@ -567,14 +570,16 @@ SideToBoundary get_side_near_boundary(
 
       seen.insert(id);
       if (const auto projected_opt = get_left_dist_to_boundary(side.left, lane_bbox)) {
-        left_projections.push_back(*projected_opt);
+        left_projections.emplace_back(*projected_opt, lane_bbox);
       }
 
       if (const auto projected_opt = get_right_dist_to_boundary(side.right, lane_bbox)) {
-        right_projections.push_back(*projected_opt);
+        right_projections.emplace_back(*projected_opt, lane_bbox);
       }
     }
-    const auto get_min = [](const Projection & proj1, const Projection & proj2) {
+    const auto get_min = [](const auto & proj1s, const auto & proj2s) {
+      const auto & [proj1, seg1] = proj1s;
+      const auto & [proj2, seg2] = proj2s;
       return std::abs(proj1.dist) < std::abs(proj2.dist);
     };
 

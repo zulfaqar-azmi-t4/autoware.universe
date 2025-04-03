@@ -532,23 +532,31 @@ visualization_msgs::msg::MarkerArray LaneDepartureCheckerNode::createMarkerArray
   // Vehicle Footprints
   {
     auto marker = create_default_marker(
-      "map", this->now(), "closest_to_side", 0, visualization_msgs::msg::Marker::LINE_LIST,
+      "map", this->now(), "proj_to_side", 0, visualization_msgs::msg::Marker::LINE_LIST,
       create_marker_scale(0.05, 0, 0), create_marker_color(0.0, 1.0, 0.0, 0.5));
+    auto marker2 = create_default_marker(
+      "map", this->now(), "closest_to_side", 0, visualization_msgs::msg::Marker::LINE_LIST,
+      create_marker_scale(0.05, 0, 0), create_marker_color(0.4, 1.0, 0.4, 0.5));
 
     const auto [left, right] = output_.side_near_boundary;
 
-    for (const auto & [orig, proj, dist] : left) {
+    for (const auto & [projection, segment] : left) {
+      const auto & [orig, proj, dist] = projection;
       marker.color = create_marker_color(1.0, 1.0, 0.0, 0.5);
       marker.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
       marker.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(segment.first.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(segment.second.to_3d(base_link_z)));
     }
 
-    for (const auto & [orig, proj, dist] : right) {
+    for (const auto & [projection, segment] : right) {
+      const auto & [orig, proj, dist] = projection;
       marker.color = create_marker_color(1.0, 0.0, 1.0, 0.5);
       marker.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
       marker.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
     }
     marker_array.markers.push_back(marker);
+    marker_array.markers.push_back(marker2);
   }
   return marker_array;
 }
