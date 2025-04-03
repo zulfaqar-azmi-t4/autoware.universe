@@ -545,17 +545,19 @@ visualization_msgs::msg::MarkerArray LaneDepartureCheckerNode::createMarkerArray
       marker.color = create_marker_color(1.0, 1.0, 0.0, 0.5);
       marker.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
       marker.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
-      marker2.points.push_back(autoware_utils::to_msg(segment.first.to_3d(base_link_z)));
-      marker2.points.push_back(autoware_utils::to_msg(segment.second.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(segment.first.to_3d(base_link_z)));
+      marker.points.push_back(autoware_utils::to_msg(segment.second.to_3d(base_link_z)));
     }
+    marker_array.markers.push_back(marker);
 
     for (const auto & [projection, segment] : right) {
       const auto & [orig, proj, dist] = projection;
       marker.color = create_marker_color(1.0, 0.0, 1.0, 0.5);
-      marker.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
-      marker.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(orig.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(proj.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(segment.first.to_3d(base_link_z)));
+      marker2.points.push_back(autoware_utils::to_msg(segment.second.to_3d(base_link_z)));
     }
-    marker_array.markers.push_back(marker);
     marker_array.markers.push_back(marker2);
   }
   return marker_array;
