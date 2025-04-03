@@ -298,6 +298,21 @@ std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> get_nearby_uncrossab
   return uncrossable_boundaries;
 }
 
+bool point_between_projection(const Point2d & p, const Segment2d & segment)
+{
+  const auto & p1 = segment.first;
+  const auto & p2 = segment.second;
+
+  const Point2d p2_vec = {p2.x() - p1.x(), p2.y() - p1.y()};
+  const Point2d p_vec = {p.x() - p1.x(), p.y() - p1.y()};
+
+  const auto c1 = boost::geometry::dot_product(p_vec, p2_vec);
+  if (c1 < 0.0) return false;
+
+  const auto c2 = boost::geometry::dot_product(p2_vec, p2_vec);
+  return (c1 <= c2);
+}
+
 std::optional<Projection> point_to_segment_projection(
   const Point2d & p, const Segment2d & segment, const bool swap_points = false)
 {
@@ -471,63 +486,71 @@ SideToBoundary get_closest_boundary_from_side(
 {
   const auto is_uncrossable_type = [&boundary_types_to_detect](const auto & ls) {
     constexpr auto no_type = "";
-    const auto & types = boundary_types_to_detect;
     const auto type = ls.attributeOr(lanelet::AttributeName::Type, no_type);
-    return (type != no_type && std::find(types.begin(), types.end(), type) != types.end());
+    return (
+      type != no_type &&
+      std::find(boundary_types_to_detect.begin(), boundary_types_to_detect.end(), type) !=
+        boundary_types_to_detect.end());
   };
 
   SideToBoundary side;
-  for (const auto & sides : ego_footprints_sides) {
-    const auto & left = sides.left;
-    Side<std::pair<lanelet::ConstLineString3d, double>> closest_ls;
-    closest_ls.left.second = std::numeric_limits<double>::max();
-    const lanelet::BasicPoint2d left_front{left.first.x(), left.first.y()};
-    const lanelet::BasicSegment2d seg{left.first, left.second};
-    std::optional<Projection> proj;
-    Segment2d proj_bound_seg;
-    const auto closest_left = lanelet_map.lineStringLayer.nearestUntil(
-      left_front, [&](const auto & bbox, const lanelet::ConstLineString3d & ls) {
-        if (!is_uncrossable_type(ls)) {
-          return false;
-        }
 
-        const auto bbox_dist = lanelet::geometry::distance2d(bbox, left_front);
-        if (bbox_dist > closest_ls.left.second) {
-          fmt::print("bbox_dist = {}, ls dist = {}\n", bbox_dist, closest_ls.left.second);
-          return true;
-        }
+  for (const auto & ego : ego_footprints_sides) {
+    const auto project_closest = [&](
+                                   const Segment2d & ego_seg, bool is_target_left,
+                                   std::vector<std::pair<Projection, Segment2d>> & output_side) {
+      std::optional<Projection> closest_proj;
+      Segment2d closest_seg;
+      double min_dist = std::numeric_limits<double>::max();
+      const lanelet::BasicPoint2d ego_start{ego_seg.first.x(), ego_seg.first.y()};
+      const lanelet::BasicSegment2d ego_line{ego_seg.first, ego_seg.second};
 
-        const double dist = lanelet::geometry::distance2d(seg, ls.basicLineString());
-        if (dist < closest_ls.left.second) {
+      lanelet_map.lineStringLayer.nearestUntil(
+        ego_start, [&](const auto & bbox, const lanelet::ConstLineString3d & ls) {
+          if (!is_uncrossable_type(ls)) return false;
+
+          const double bbox_dist = lanelet::geometry::distance2d(bbox, ego_start);
+          if (bbox_dist > min_dist) return true;
+
+          const double dist = lanelet::geometry::distance2d(ego_line, ls.basicLineString());
+          if (dist >= min_dist) return false;
+
           const auto & basic_ls = ls.basicLineString();
+          for (size_t i = 0; i + 1 < basic_ls.size(); ++i) {
+            const Point2d p1{basic_ls[i].x(), basic_ls[i].y()};
+            const Point2d p2{basic_ls[i + 1].x(), basic_ls[i + 1].y()};
+            const Segment2d lane_seg{p1, p2};
 
-          for (size_t i = 0; i < basic_ls.size() - 1; ++i) {
-            const Point2d p1 = {basic_ls.at(i).x(), basic_ls.at(i).y()};
-            const Point2d p2 = {basic_ls.at(i + 1).x(), basic_ls.at(i + 1).y()};
-            if (const auto projection_opt = segment_to_segment_nearest_projection(left, {p1, p2})) {
-              const auto & [front, back] = left;
-              const auto direction =
-                (back.x() - front.x()) * (projection_opt->orig.y() - front.y()) -
-                (back.y() - front.y()) * (projection_opt->orig.x() - front.x());
-              const auto is_left = std::signbit(direction);
-              if (!is_left) {
-                continue;
-              }
-              if (!proj || projection_opt->dist < proj->dist) {
-                closest_ls.left = {ls, dist};
-                proj = projection_opt;
-                proj_bound_seg = {p1, p2};
+            if (const auto proj_opt = segment_to_segment_nearest_projection(ego_seg, lane_seg)) {
+              const auto & [front, back] = ego_seg;
+              const auto direction = (back.x() - front.x()) * (proj_opt->orig.y() - front.y()) -
+                                     (back.y() - front.y()) * (proj_opt->orig.x() - front.x());
+              const bool is_left_of_ego = std::signbit(direction);
+
+              if (is_left_of_ego != is_target_left) continue;
+
+              if ((!closest_proj || proj_opt->dist < closest_proj->dist)) {
+                closest_proj = *proj_opt;
+                closest_seg = lane_seg;
+                min_dist = dist;
               }
             }
           }
-        }
-        return false;
-      });
-    if (proj) {
-      side.left.emplace_back(*proj, proj_bound_seg);
-    }
+
+          return false;
+        });
+
+      if (closest_proj) {
+        output_side.emplace_back(*closest_proj, closest_seg);
+      }
+    };
+
+    // Use the lambda for both left and right
+    project_closest(ego.left, true, side.left);     // Left side
+    project_closest(ego.right, false, side.right);  // Right side
   }
-  fmt::print("Size of left size {}\n", side.left.size());
+
+  fmt::print("Size of left side: {}, right side: {}\n", side.left.size(), side.right.size());
   return side;
 }
 
