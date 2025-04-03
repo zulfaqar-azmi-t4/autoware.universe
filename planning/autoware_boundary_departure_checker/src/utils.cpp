@@ -459,6 +459,33 @@ SegmentWithIdxRtree build_uncrossable_boundaries_rtree(
   return {segments.begin(), segments.end()};
 }
 
+SideToBoundary get_closest_boundary_from_side(
+  const lanelet::LaneletMap & lanelet_map, const EgoFootprintsSides & ego_footprints_sides,
+  const std::vector<std::string> & boundary_types_to_detect)
+{
+  const auto is_uncrossable_type = [&boundary_types_to_detect](const auto & ls) {
+    constexpr auto no_type = "";
+    const auto & types = boundary_types_to_detect;
+    const auto type = ls.attributeOr(lanelet::AttributeName::Type, no_type);
+    return (type != no_type && std::find(types.begin(), types.end(), type) != types.end());
+  };
+
+  for (const auto & [left, right] : ego_footprints_sides) {
+    Side<std::pair<lanelet::ConstLineString3d, double>> closest_ls;
+    const lanelet::BasicPoint2d left_front{left.first.x(), left.first.y()};
+    const auto closest_left = lanelet_map.lineStringLayer.nearestUntil(left_front, [&](const auto & bbox, const auto & ls){
+      if(lanelet::geometry::distance2d(bbox, left_front) > closest_ls.left.second){
+        return true;
+      }
+      const double dist = lanelet::geometry::distance2d(left, ls);
+      if(is_uncrossable_type(ls) && dist < closest_ls.left.second){
+        closest_ls.left = {ls, dist};
+      }
+      return false;
+    });
+  }
+}
+
 SideToBoundary get_side_near_boundary(
   const EgoFootprintsSides & ego_footprints_sides,
   const std::unordered_map<lanelet::Id, lanelet::BasicLineString3d> & uncrossable_boundaries)
