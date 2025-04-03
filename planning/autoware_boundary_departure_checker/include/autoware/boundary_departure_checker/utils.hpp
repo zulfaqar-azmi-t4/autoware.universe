@@ -30,6 +30,8 @@
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_core/primitives/Polygon.h>
 
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace autoware::lane_departure_checker::utils
