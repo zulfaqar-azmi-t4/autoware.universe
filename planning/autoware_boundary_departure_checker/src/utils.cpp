@@ -22,6 +22,12 @@
 #include <fmt/format.h>
 #include <lanelet2_core/geometry/Polygon.h>
 
+#include <algorithm>
+#include <limits>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
