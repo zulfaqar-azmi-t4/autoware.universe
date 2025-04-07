@@ -1,0 +1,27 @@
+/**:
+  ros__parameters:
+    boundary_departure_prevention:
+      boundary_type_to_detect: [road_border]
+
+      slow_down_near_boundary:
+        enable: true
+        th_dist_to_boundary_m:
+          left: 0.25
+          right: 0.25
+
+      slow_down_before_departure:
+        enable: true
+        th_dist_to_boundary_m:
+          left: 0.001
+          right: 0.001
+
+      stop_before_departure:
+        enable: true
+        th_dist_to_boundary_m:
+          left: 0.001
+          right: 0.001
+
+      predicted_path_footprint:
+        footprint_margin_scale: 1.0
+        footprint_extra_margin_m: 0.0
+        resample_interval_m: 0.3
