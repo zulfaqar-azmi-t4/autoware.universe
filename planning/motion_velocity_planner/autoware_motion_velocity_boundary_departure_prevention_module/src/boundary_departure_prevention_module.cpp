@@ -63,13 +63,14 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
 
 Output BoundaryDeparturePreventionModule::plan(
   const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
-  const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale)
+  const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale, const lanelet::LaneletMap & lanelet_map, const std::vector<std::string> & boundary_types_to_detect)
 {
   Output output;
 
   const auto footprints_with_pose = lane_departure_checker::utils::createVehicleFootprints(
     pose_with_covariance, ego_pred_traj, vehicle_info, footprint_margin_scale);
   const auto footprints_sides = utils::get_ego_footprints_sides(footprints_with_pose);
+  const auto dist_sides_to_closest_bound = lane_departure_checker::utils::get_closest_boundary_from_side(lanelet_map, footprints_sides, boundary_types_to_detect);
 
   return output;
 }
