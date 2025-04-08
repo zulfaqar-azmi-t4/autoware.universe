@@ -262,13 +262,7 @@
     </group>
 
     <!-- lane departure checker -->
-    <node
-      pkg="autoware_lane_departure_checker"
-      exec="lane_departure_checker_node"
-      name="lane_departure_checker_node"
-      namespace="trajectory_follower"
-      launch-prefix="xterm -l -lf /home/zulfaqarazmi/develop/aw.txt -e gdb -ex run --args"
-    >
+    <node pkg="autoware_lane_departure_checker" exec="lane_departure_checker_node" name="lane_departure_checker_node" namespace="trajectory_follower">
       <remap from="~/input/odometry" to="/localization/kinematic_state"/>
       <remap from="~/input/lanelet_map_bin" to="/map/vector_map"/>
       <remap from="~/input/route" to="/planning/mission_planning/route"/>

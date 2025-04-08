@@ -18,6 +18,8 @@
 
 #include <autoware/boundary_departure_checker/utils.hpp>
 
+#include <fmt/format.h>
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -26,13 +28,21 @@
 namespace autoware::motion_velocity_planner
 {
 
-void BoundaryDeparturePreventionModule::init(rclcpp::Node & node, const std::string & module_name)
+void BoundaryDeparturePreventionModule::init(
+  [[maybe_unused]] rclcpp::Node & node, [[maybe_unused]] const std::string & module_name)
 {
+  fmt::print("Running Boundary Departure Prevention Module\n");
   module_name_ = module_name;
   clock_ptr_ = node.get_clock();
   logger_ = node.get_logger();
 
+  // node_param_ = param::NodeParam(node);
   subscribe_topics(node);
+}
+
+void BoundaryDeparturePreventionModule::update_parameters(
+  [[maybe_unused]] const std::vector<rclcpp::Parameter> & parameters)
+{
 }
 
 void BoundaryDeparturePreventionModule::subscribe_topics(rclcpp::Node & node)
@@ -47,10 +57,11 @@ void BoundaryDeparturePreventionModule::subscribe_topics(rclcpp::Node & node)
 }
 
 VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
-  const std::vector<TrajectoryPoint> & raw_trajectory_points,
-  [[maybe_unused]] const std::vector<TrajectoryPoint> & smoothed_trajectory_points,
+  [[maybe_unused]] const TrajectoryPoints & raw_trajectory_points,
+  [[maybe_unused]] const TrajectoryPoints & smoothed_trajectory_points,
   const std::shared_ptr<const PlannerData> planner_data)
 {
+  fmt::print("Running Boundary Departure Prevention Module is running\n");
   VelocityPlanningResult result;
   [[maybe_unused]] const auto & curr_pose = planner_data->current_odometry.pose;
   [[maybe_unused]] const auto & curr_twist = planner_data->current_odometry.twist.twist;
@@ -58,19 +69,27 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
   [[maybe_unused]] auto trajectory =
     trajectory::Trajectory<TrajectoryPoint>::Builder{}.build(raw_trajectory_points);
 
+  // [[maybe_unused]] const auto output = plan(
+  //   planner_data->current_odometry.pose, raw_trajectory_points, vehicle_info,
+  //   node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
+  //   node_param_.boundary_types_to_detect);
   return {};
 }
 
 Output BoundaryDeparturePreventionModule::plan(
   const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
-  const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale, const lanelet::LaneletMap & lanelet_map, const std::vector<std::string> & boundary_types_to_detect)
+  const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale,
+  const lanelet::LaneletMap & lanelet_map,
+  const std::vector<std::string> & boundary_types_to_detect)
 {
   Output output;
 
   const auto footprints_with_pose = lane_departure_checker::utils::createVehicleFootprints(
     pose_with_covariance, ego_pred_traj, vehicle_info, footprint_margin_scale);
   const auto footprints_sides = utils::get_ego_footprints_sides(footprints_with_pose);
-  const auto dist_sides_to_closest_bound = lane_departure_checker::utils::get_closest_boundary_from_side(lanelet_map, footprints_sides, boundary_types_to_detect);
+  const auto [dists_to_left, dists_to_right] =
+    lane_departure_checker::utils::get_closest_boundary_from_side(
+      lanelet_map, footprints_sides, boundary_types_to_detect);
 
   return output;
 }
@@ -117,3 +136,8 @@ bool BoundaryDeparturePreventionModule::is_data_timeout(const Odometry & odom) c
   return false;
 }
 }  // namespace autoware::motion_velocity_planner
+
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(
+  autoware::motion_velocity_planner::BoundaryDeparturePreventionModule,
+  autoware::motion_velocity_planner::PluginModuleInterface)

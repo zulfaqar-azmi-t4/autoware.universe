@@ -31,29 +31,31 @@ public:
   void init(rclcpp::Node & node, const std::string & module_name) override;
   void update_parameters(const std::vector<rclcpp::Parameter> & parameters) override;
   VelocityPlanningResult plan(
-    const std::vector<TrajectoryPoint> & raw_trajectory_points,
-    const std::vector<TrajectoryPoint> & smoothed_trajectory_points,
+    const TrajectoryPoints & raw_trajectory_points,
+    const TrajectoryPoints & smoothed_trajectory_points,
     const std::shared_ptr<const PlannerData> planner_data) override;
-  std::string get_module_name() const override;
+  std::string get_module_name() const override { return module_name_; };
 
 private:
   void subscribe_topics(rclcpp::Node & node);
   Output plan(
     const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
-    const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale);
+    const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale,
+    const lanelet::LaneletMap & lanelet_map,
+    const std::vector<std::string> & boundary_types_to_detect);
   [[nodiscard]] bool is_data_ready(std::unordered_map<std::string, double> & processing_times);
   [[nodiscard]] bool is_data_valid() const;
   [[nodiscard]] bool is_data_timeout(const Odometry & odom) const;
   Output plan();
 
-  std::string module_name_{};
+  std::string module_name_;
   param::NodeParam node_param_;
-  rclcpp::Clock::SharedPtr clock_ptr_{};
-  rclcpp::TimerBase::SharedPtr timer_ptr_{};
+  rclcpp::Clock::SharedPtr clock_ptr_;
+  rclcpp::TimerBase::SharedPtr timer_ptr_;
   static constexpr auto throttle_duration_ms{5000};
 
-  Trajectory::ConstSharedPtr ego_pred_traj_ptr_{};
-  OperationModeState::ConstSharedPtr op_mode_state_ptr_{};
+  Trajectory::ConstSharedPtr ego_pred_traj_ptr_;
+  OperationModeState::ConstSharedPtr op_mode_state_ptr_;
 
   rclcpp::Subscription<Trajectory>::SharedPtr sub_ego_pred_traj_;
   rclcpp::Subscription<OperationModeState>::SharedPtr sub_op_mode_state_;

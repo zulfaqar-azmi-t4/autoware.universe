@@ -16,6 +16,7 @@
 #define TYPE_ALIAS_HPP_
 
 #include <autoware/boundary_departure_checker/parameters.hpp>
+#include <autoware/motion_utils/marker/virtual_wall_marker_creator.hpp>
 #include <autoware/trajectory/trajectory_point.hpp>
 #include <autoware_utils/geometry/geometry.hpp>
 #include <autoware_utils/ros/polling_subscriber.hpp>
@@ -26,6 +27,7 @@
 #include <autoware_planning_msgs/msg/trajectory_point.hpp>
 #include <geometry_msgs/msg/pose_with_covariance.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include <vector>
 
@@ -47,6 +49,7 @@ using autoware_utils_geometry::LinearRing2d;
 using autoware_utils_geometry::Point2d;  // NOLINT(misc-unused-using-decls)
 using lane_departure_checker::EgoFootprintSide;
 using lane_departure_checker::EgoFootprintsSides;
+using visualization_msgs::msg::MarkerArray;
 }  // namespace autoware::motion_velocity_planner
 
 #endif  // TYPE_ALIAS_HPP_

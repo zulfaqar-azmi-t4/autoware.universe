@@ -14,6 +14,8 @@
 
 #include "type_alias.hpp"
 
+#include <autoware_utils/ros/parameter.hpp>
+
 #include <limits>
 #include <string>
 #include <vector>
@@ -23,6 +25,7 @@
 
 namespace autoware::motion_velocity_planner::param
 {
+using autoware_utils::get_or_declare_parameter;
 struct BoundaryBehaviorTrigger
 {
   bool enable{true};
@@ -30,13 +33,57 @@ struct BoundaryBehaviorTrigger
     std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};
 };
 
+struct PredictedPathFootprint
+{
+  double scale{1.0};
+  double extra_margin_m{0.0};
+  double resample_interval_m{0.3};
+};
+
 struct NodeParam
 {
-  double update_rate{10.0};
-  std::vector<std::string> boundary_type_to_detect{};
+  double th_data_timeout_s{1.0};
+  std::vector<std::string> boundary_types_to_detect;
+
   BoundaryBehaviorTrigger slow_down_near_boundary;
   BoundaryBehaviorTrigger slow_down_before_departure;
   BoundaryBehaviorTrigger stop_before_departure;
+
+  PredictedPathFootprint pred_path_footprint;
+
+  NodeParam() = default;
+  explicit NodeParam(rclcpp::Node & node)
+  {
+    const std::string module_name{"boundary_departure_prevention."};
+    th_data_timeout_s = get_or_declare_parameter<double>(node, module_name + "th_data_timeout_s");
+    boundary_types_to_detect = get_or_declare_parameter<std::vector<std::string>>(
+      node, module_name + "boundary_types_to_detect");
+
+    const auto boundary_behaviour_trigger_param =
+      [&node, &module_name](const std::string & trigger_type_str) {
+        BoundaryBehaviorTrigger trigger;
+        trigger.enable = get_or_declare_parameter<bool>(node, "enable");
+        trigger.th_dist_to_boundary_m.left =
+          get_or_declare_parameter<double>(node, module_name + trigger_type_str + "left");
+        trigger.th_dist_to_boundary_m.right =
+          get_or_declare_parameter<double>(node, module_name + trigger_type_str + "right");
+        return trigger;
+      };
+
+    slow_down_near_boundary = boundary_behaviour_trigger_param("slow_down_near_boundary");
+    slow_down_before_departure = boundary_behaviour_trigger_param("slow_down_before_departure");
+    stop_before_departure = boundary_behaviour_trigger_param("stop_before_departure");
+
+    pred_path_footprint = std::invoke([&node, &module_name]() {
+      PredictedPathFootprint param;
+      const std::string ns{module_name + "predicted_path_footprint."};
+      param.scale = get_or_declare_parameter<double>(node, ns + "scale");
+      param.extra_margin_m = get_or_declare_parameter<double>(node, ns + "extra_margin_m");
+      param.resample_interval_m =
+        get_or_declare_parameter<double>(node, ns + "resample_interval_m");
+      return param;
+    });
+  }
 };
 }  // namespace autoware::motion_velocity_planner::param
 
