@@ -19,7 +19,9 @@
 
 namespace autoware::motion_velocity_planner::debug
 {
-MarkerArray create_debug_marker_array();
+MarkerArray create_debug_marker_array(
+  const lane_departure_checker::Output & output, const rclcpp::Clock::SharedPtr & clock_ptr,
+  const double base_link_z);
 }  // namespace autoware::motion_velocity_planner::debug
 
 #endif  // DEBUG_HPP_

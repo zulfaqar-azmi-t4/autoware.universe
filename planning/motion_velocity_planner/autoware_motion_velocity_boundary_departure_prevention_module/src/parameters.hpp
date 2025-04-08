@@ -59,16 +59,17 @@ struct NodeParam
     boundary_types_to_detect = get_or_declare_parameter<std::vector<std::string>>(
       node, module_name + "boundary_types_to_detect");
 
-    const auto boundary_behaviour_trigger_param =
-      [&node, &module_name](const std::string & trigger_type_str) {
-        BoundaryBehaviorTrigger trigger;
-        trigger.enable = get_or_declare_parameter<bool>(node, "enable");
-        trigger.th_dist_to_boundary_m.left =
-          get_or_declare_parameter<double>(node, module_name + trigger_type_str + "left");
-        trigger.th_dist_to_boundary_m.right =
-          get_or_declare_parameter<double>(node, module_name + trigger_type_str + "right");
-        return trigger;
-      };
+    auto boundary_behaviour_trigger_param = [&node,
+                                             &module_name](const std::string & trigger_type_str) {
+      BoundaryBehaviorTrigger trigger;
+      const std::string ns{module_name + trigger_type_str + "."};
+      trigger.enable = get_or_declare_parameter<bool>(node, ns + "enable");
+      trigger.th_dist_to_boundary_m.left =
+        get_or_declare_parameter<double>(node, ns + "th_dist_to_boundary_m.left");
+      trigger.th_dist_to_boundary_m.right =
+        get_or_declare_parameter<double>(node, ns + "th_dist_to_boundary_m.right");
+      return trigger;
+    };
 
     slow_down_near_boundary = boundary_behaviour_trigger_param("slow_down_near_boundary");
     slow_down_before_departure = boundary_behaviour_trigger_param("slow_down_before_departure");

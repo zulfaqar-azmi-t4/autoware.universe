@@ -14,6 +14,7 @@
 
 #include "boundary_departure_prevention_module.hpp"
 
+#include "debug.hpp"
 #include "utils.hpp"
 
 #include <autoware/boundary_departure_checker/utils.hpp>
@@ -36,8 +37,9 @@ void BoundaryDeparturePreventionModule::init(
   clock_ptr_ = node.get_clock();
   logger_ = node.get_logger();
 
-  // node_param_ = param::NodeParam(node);
+  node_param_ = param::NodeParam(node);
   subscribe_topics(node);
+  publish_topics(node);
 }
 
 void BoundaryDeparturePreventionModule::update_parameters(
@@ -56,6 +58,13 @@ void BoundaryDeparturePreventionModule::subscribe_topics(rclcpp::Node & node)
     [this](const OperationModeState::SharedPtr msg) { op_mode_state_ptr_ = msg; });
 }
 
+void BoundaryDeparturePreventionModule::publish_topics(rclcpp::Node & node)
+{
+  const std::string ns = "boundary_departure_prevention";
+  debug_publisher_ =
+    node.create_publisher<visualization_msgs::msg::MarkerArray>("~/" + ns + "/debug_markers", 1);
+}
+
 VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
   [[maybe_unused]] const TrajectoryPoints & raw_trajectory_points,
   [[maybe_unused]] const TrajectoryPoints & smoothed_trajectory_points,
@@ -69,10 +78,14 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
   [[maybe_unused]] auto trajectory =
     trajectory::Trajectory<TrajectoryPoint>::Builder{}.build(raw_trajectory_points);
 
-  // [[maybe_unused]] const auto output = plan(
-  //   planner_data->current_odometry.pose, raw_trajectory_points, vehicle_info,
-  //   node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
-  //   node_param_.boundary_types_to_detect);
+  [[maybe_unused]] const auto output = plan(
+    planner_data->current_odometry.pose, raw_trajectory_points, vehicle_info,
+    node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
+    node_param_.boundary_types_to_detect);
+  if(debug_publisher_){
+    debug_publisher_->publish(
+                              debug::create_debug_marker_array(output, clock_ptr_, curr_pose.pose.position.z));
+  }
   return {};
 }
 
