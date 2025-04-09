@@ -39,7 +39,7 @@ public:
 private:
   void subscribe_topics(rclcpp::Node & node);
   void publish_topics(rclcpp::Node & node);
-  Output plan(
+  std::optional<Output> plan(
     const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
     const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale,
     const lanelet::LaneletMap & lanelet_map,

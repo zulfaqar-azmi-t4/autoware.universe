@@ -14,40 +14,83 @@
 
 #include "debug.hpp"
 
-#include <autoware_utils/ros/marker_helper.hpp>
+namespace color
+{
+using std_msgs::msg::ColorRGBA;
+
+inline ColorRGBA blue(float a = 0.99)
+{
+  return autoware_utils::create_marker_color(0., 0., 1., a);
+}
+
+inline ColorRGBA yellow(float a = 0.99)
+{
+  return autoware_utils::create_marker_color(1., 1., 0., a);
+}
+
+inline ColorRGBA green(float a = 0.99)
+{
+  return autoware_utils::create_marker_color(0., 1., 0., a);
+}
+}  // namespace color
 
 namespace autoware::motion_velocity_planner::debug
 {
-MarkerArray create_debug_marker_array(
-  [[maybe_unused]]const lane_departure_checker::Output & output, const rclcpp::Clock::SharedPtr & clock_ptr,
-  [[maybe_unused]]const double base_link_z)
+Marker create_ego_sides_marker(
+  const EgoFootprintsSides & ego_footprints_sides, Marker marker, std::string && ns,
+  const double base_link_z)
 {
-  using autoware_utils::create_default_marker;
-  using autoware_utils::create_marker_color;
-  using autoware_utils::create_marker_scale;
-  using autoware_utils::to_msg;
-
-  const auto line_list = visualization_msgs::msg::Marker::LINE_LIST;
-
-  const auto curr_time = clock_ptr->now();
-
-  MarkerArray marker_array;
-  const auto color = create_marker_color(0.0, 1.0, 0.0, 0.5);
-  const auto m_scale = create_marker_scale(0.05, 0, 0);
-
-  auto marker =
-    create_default_marker("map", curr_time, "vehicle_sides", 0, line_list, m_scale, color);
-
+  marker.ns = ns;
+  marker.points.reserve(ego_footprints_sides.size() * 4);
   const auto to_geom = [base_link_z](const auto & pt) { return to_msg(pt.to_3d(base_link_z)); };
-
-  for (const auto & [left, right] : output.ego_footprints_sides) {
+  for (const auto & [left, right] : ego_footprints_sides) {
     marker.points.push_back(to_geom(left.first));
     marker.points.push_back(to_geom(left.second));
     marker.points.push_back(to_geom(right.first));
     marker.points.push_back(to_geom(right.second));
   }
 
-  marker_array.markers.push_back(marker);
+  return marker;
+}
+
+Marker create_side_to_boundary_marker(
+  const std::vector<std::pair<Projection, Segment2d>> & side_to_boundary, Marker marker,
+  std::string && ns, const double base_link_z)
+{
+  marker.ns = ns;
+  const auto to_geom = [base_link_z](const auto & pt) { return to_msg(pt.to_3d(base_link_z)); };
+  for (const auto & [projection, segment] : side_to_boundary) {
+    const auto & [orig, proj, dist] = projection;
+    marker.color = color::blue();
+    marker.points.push_back(to_geom(orig));
+    marker.points.push_back(to_geom(proj));
+    marker.points.push_back(to_geom(segment.first));
+    marker.points.push_back(to_geom(segment.second));
+  }
+  return marker;
+}
+
+MarkerArray create_debug_marker_array(
+  [[maybe_unused]] const lane_departure_checker::Output & output,
+  const rclcpp::Clock::SharedPtr & clock_ptr, [[maybe_unused]] const double base_link_z)
+{
+  const auto line_list = visualization_msgs::msg::Marker::LINE_LIST;
+  const auto curr_time = clock_ptr->now();
+  const auto color = color::green();
+  const auto m_scale = create_marker_scale(0.05, 0, 0);
+
+  MarkerArray marker_array;
+
+  auto marker = create_default_marker("map", curr_time, "", 0, line_list, m_scale, color);
+
+  marker_array.markers.push_back(
+    create_ego_sides_marker(output.ego_footprints_sides, marker, "ego_sides", base_link_z));
+  marker_array.markers.push_back(create_side_to_boundary_marker(
+    output.side_near_boundary.left, marker, "closest_to_left_side", base_link_z));
+  marker_array.markers.push_back(create_side_to_boundary_marker(
+    output.side_near_boundary.right, marker, "closest_to_right_side", base_link_z));
+
   return marker_array;
 }
+
 }  // namespace autoware::motion_velocity_planner::debug

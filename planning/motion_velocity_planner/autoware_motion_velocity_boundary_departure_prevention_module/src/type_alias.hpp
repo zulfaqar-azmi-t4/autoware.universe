@@ -19,7 +19,9 @@
 #include <autoware/motion_utils/marker/virtual_wall_marker_creator.hpp>
 #include <autoware/trajectory/trajectory_point.hpp>
 #include <autoware_utils/geometry/geometry.hpp>
+#include <autoware_utils/ros/marker_helper.hpp>
 #include <autoware_utils/ros/polling_subscriber.hpp>
+#include <autoware_vehicle_info_utils/vehicle_info.hpp>
 
 #include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
 #include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
@@ -42,14 +44,30 @@ using nav_msgs::msg::Odometry;
 using TrajectoryPoints = std::vector<TrajectoryPoint>;
 using autoware_adapi_v1_msgs::msg::OperationModeState;
 using BoundaryThreshold = lane_departure_checker::Side<double>;
-using lane_departure_checker::Output;                       // NOLINT(misc-unused-using-decls)
-namespace trajectory = autoware::trajectory;                // NOLINT(misc-unused-alias-decls)
-namespace polling_policy = autoware_utils::polling_policy;  // NOLINT(misc-unused-alias-decls)
 using autoware_utils_geometry::LinearRing2d;
-using autoware_utils_geometry::Point2d;  // NOLINT(misc-unused-using-decls)
+using autoware_utils_geometry::Segment2d;
 using lane_departure_checker::EgoFootprintSide;
 using lane_departure_checker::EgoFootprintsSides;
+using lane_departure_checker::SideToBoundary;
+using visualization_msgs::msg::Marker;
 using visualization_msgs::msg::MarkerArray;
+
+// NOLINTBEGIN(misc-unused-alias-decls)
+namespace trajectory = autoware::trajectory;
+namespace polling_policy = autoware_utils::polling_policy;
+// NOLINTEND(misc-unused-alias-decls)
+
+// NOLINTBEGIN(misc-unused-using-decls)
+using autoware_utils::create_default_marker;
+using autoware_utils::create_marker_color;
+using autoware_utils::create_marker_scale;
+using autoware_utils::to_msg;
+using autoware_utils_geometry::Point2d;
+using lane_departure_checker::Output;
+using lane_departure_checker::Projection;
+using vehicle_info_utils::VehicleInfo;
+// NOLINTEND(misc-unused-using-decls)
+
 }  // namespace autoware::motion_velocity_planner
 
 #endif  // TYPE_ALIAS_HPP_

@@ -15,13 +15,16 @@
 #ifndef UTILS_HPP_
 #define UTILS_HPP_
 
-#include "type_alias.hpp"
+#include "parameters.hpp"
 
 #include <vector>
 
 namespace autoware::motion_velocity_planner::utils
 {
-EgoFootprintsSides get_ego_footprints_sides(
-  const std::vector<std::pair<LinearRing2d, Pose>> & footprints_with_pose);
+std::optional<std::vector<LinearRing2d>> create_vehicle_footprints(
+  const geometry_msgs::msg::PoseWithCovariance & covariance, const TrajectoryPoints & trajectory,
+  const VehicleInfo & vehicle_info, const double footprint_margin_scale);
+
+EgoFootprintsSides get_ego_footprints_sides(const std::vector<LinearRing2d> & footprints_with_pose);
 }  // namespace autoware::motion_velocity_planner::utils
 #endif  // UTILS_HPP_

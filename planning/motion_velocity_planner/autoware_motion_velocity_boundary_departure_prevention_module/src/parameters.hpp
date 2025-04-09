@@ -40,6 +40,12 @@ struct PredictedPathFootprint
   double resample_interval_m{0.3};
 };
 
+struct FootprintMargin
+{
+  double lon;
+  double lat;
+};
+
 struct NodeParam
 {
   double th_data_timeout_s{1.0};

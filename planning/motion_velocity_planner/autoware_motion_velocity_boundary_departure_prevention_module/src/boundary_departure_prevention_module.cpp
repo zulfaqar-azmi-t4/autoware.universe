@@ -49,13 +49,14 @@ void BoundaryDeparturePreventionModule::update_parameters(
 
 void BoundaryDeparturePreventionModule::subscribe_topics(rclcpp::Node & node)
 {
+  fmt::print("Subscribing\n");
   sub_ego_pred_traj_ = node.create_subscription<Trajectory>(
-    "~/input/ego_pred_traj", rclcpp::QoS{1},
-    [&](const Trajectory::SharedPtr msg) { ego_pred_traj_ptr_ = msg; });
+    "/control/trajectory_follower/lateral/predicted_trajectory", rclcpp::QoS{1},
+    [&](const Trajectory::ConstSharedPtr msg) { ego_pred_traj_ptr_ = msg; });
 
   sub_op_mode_state_ = node.create_subscription<OperationModeState>(
     "~/api/operation_mode/state", rclcpp::QoS{1},
-    [this](const OperationModeState::SharedPtr msg) { op_mode_state_ptr_ = msg; });
+    [this](const OperationModeState::ConstSharedPtr msg) { op_mode_state_ptr_ = msg; });
 }
 
 void BoundaryDeparturePreventionModule::publish_topics(rclcpp::Node & node)
@@ -75,34 +76,56 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
   [[maybe_unused]] const auto & curr_pose = planner_data->current_odometry.pose;
   [[maybe_unused]] const auto & curr_twist = planner_data->current_odometry.twist.twist;
   [[maybe_unused]] const auto & vehicle_info = planner_data->vehicle_info_;
+
   [[maybe_unused]] auto trajectory =
     trajectory::Trajectory<TrajectoryPoint>::Builder{}.build(raw_trajectory_points);
 
-  [[maybe_unused]] const auto output = plan(
-    planner_data->current_odometry.pose, raw_trajectory_points, vehicle_info,
+  if (!ego_pred_traj_ptr_) {
+    fmt::print("Invalid ego pred path ptr\n");
+    return {};
+  }
+
+  const auto output_opt = plan(
+    planner_data->current_odometry.pose, ego_pred_traj_ptr_->points, vehicle_info,
     node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
     node_param_.boundary_types_to_detect);
-  if(debug_publisher_){
+  if (!output_opt) {
+    fmt::print("Invalid output\n");
+    return {};
+  }
+
+  if (debug_publisher_) {
     debug_publisher_->publish(
-                              debug::create_debug_marker_array(output, clock_ptr_, curr_pose.pose.position.z));
+      debug::create_debug_marker_array(*output_opt, clock_ptr_, curr_pose.pose.position.z));
   }
   return {};
 }
 
-Output BoundaryDeparturePreventionModule::plan(
+std::optional<Output> BoundaryDeparturePreventionModule::plan(
   const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
-  const vehicle_info_utils::VehicleInfo & vehicle_info, const double footprint_margin_scale,
+  const VehicleInfo & vehicle_info, const double footprint_margin_scale,
   const lanelet::LaneletMap & lanelet_map,
   const std::vector<std::string> & boundary_types_to_detect)
 {
   Output output;
 
-  const auto footprints_with_pose = lane_departure_checker::utils::createVehicleFootprints(
+  autoware_utils::StopWatch<std::chrono::milliseconds> stop_watch;
+
+  const auto footprints_with_pose = utils::create_vehicle_footprints(
     pose_with_covariance, ego_pred_traj, vehicle_info, footprint_margin_scale);
-  const auto footprints_sides = utils::get_ego_footprints_sides(footprints_with_pose);
-  const auto [dists_to_left, dists_to_right] =
-    lane_departure_checker::utils::get_closest_boundary_from_side(
-      lanelet_map, footprints_sides, boundary_types_to_detect);
+  output.processing_time_map["create_vehicle_footprint"] = stop_watch.toc(true);
+
+  if (!footprints_with_pose) {
+    fmt::print("Invalid footprints\n");
+    return std::nullopt;
+  }
+
+  output.ego_footprints_sides = utils::get_ego_footprints_sides(*footprints_with_pose);
+  output.processing_time_map["get_ego_footprints_sides"] = stop_watch.toc(true);
+
+  output.side_near_boundary = lane_departure_checker::utils::get_closest_boundary_from_side(
+    lanelet_map, output.ego_footprints_sides, boundary_types_to_detect);
+  output.processing_time_map["get_closest_boundary_from_side"] = stop_watch.toc(true);
 
   return output;
 }
