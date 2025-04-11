@@ -46,6 +46,8 @@ struct FootprintMargin
   double lat;
 };
 
+enum class DepartureStatus { NORMAL = 0, NEAR_BOUNDARY, APPROACHING_DEPARTURE, CRITICAL_DEPARTURE };
+
 struct NodeParam
 {
   double th_data_timeout_s{1.0};

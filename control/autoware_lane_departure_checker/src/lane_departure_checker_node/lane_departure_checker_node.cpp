@@ -520,7 +520,7 @@ visualization_msgs::msg::MarkerArray LaneDepartureCheckerNode::createMarkerArray
       "map", this->now(), "vehicle_sides", 0, visualization_msgs::msg::Marker::LINE_LIST,
       create_marker_scale(0.05, 0, 0), color);
 
-    for (const auto & [left, right] : output_.ego_footprints_sides) {
+    for (const auto & [left, right, dist] : output_.ego_footprints_sides) {
       marker.points.push_back(autoware_utils::to_msg(left.first.to_3d(base_link_z)));
       marker.points.push_back(autoware_utils::to_msg(left.second.to_3d(base_link_z)));
       marker.points.push_back(autoware_utils::to_msg(right.first.to_3d(base_link_z)));
@@ -538,7 +538,7 @@ visualization_msgs::msg::MarkerArray LaneDepartureCheckerNode::createMarkerArray
       "map", this->now(), "closest_to_side", 0, visualization_msgs::msg::Marker::LINE_LIST,
       create_marker_scale(0.05, 0, 0), create_marker_color(0.4, 1.0, 0.4, 0.5));
 
-    const auto [left, right] = output_.side_near_boundary;
+    const auto [left, right, dist] = output_.side_near_boundary;
 
     for (const auto & [projection, segment] : left) {
       const auto & [orig, proj, dist] = projection;

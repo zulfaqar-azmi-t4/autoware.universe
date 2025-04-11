@@ -54,13 +54,21 @@ struct Side
 {
   T left;
   T right;
+  double dist_from_start{0.0};
+};
+
+struct ProjectionWithSegment
+{
+  Projection projection;
+  Segment2d nearest_segment;
+  size_t idx_from_ego_footprints_sides{0};
 };
 
 using SideProjOpt = Side<std::optional<Projection>>;
 using EgoFootprintSide = Side<Segment2d>;
 using BoundarySide = Side<std::vector<Segment2d>>;
 using EgoFootprintsSides = std::vector<EgoFootprintSide>;
-using SideToBoundary = Side<std::vector<std::pair<Projection, Segment2d>>>;
+using SideToBoundary = Side<std::vector<ProjectionWithSegment>>;
 
 struct Param
 {

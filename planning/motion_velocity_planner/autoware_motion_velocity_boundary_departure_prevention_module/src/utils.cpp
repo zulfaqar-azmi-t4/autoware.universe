@@ -41,7 +41,7 @@ param::FootprintMargin calc_footprint_margin(
   return param::FootprintMargin{cov_xy_vehicle(0, 0) * scale, cov_xy_vehicle(1, 1) * scale};
 }
 
-std::optional<std::vector<LinearRing2d>> create_vehicle_footprints(
+std::optional<std::vector<std::pair<LinearRing2d, Pose>>> create_vehicle_footprints(
   const geometry_msgs::msg::PoseWithCovariance & covariance, const TrajectoryPoints & trajectory,
   const autoware::vehicle_info_utils::VehicleInfo & vehicle_info,
   const double footprint_margin_scale)
@@ -55,36 +55,88 @@ std::optional<std::vector<LinearRing2d>> create_vehicle_footprints(
   // Create vehicle footprint in base_link coordinate
   const auto local_vehicle_footprint = vehicle_info.createFootprint(margin.lat, margin.lon);
 
-  // Create vehicle footprint on each TrajectoryPoint
-  std::vector<LinearRing2d> vehicle_footprints;
+  std::vector<std::pair<LinearRing2d, Pose>> vehicle_footprints;
   vehicle_footprints.reserve(trajectory.size());
   std::transform(
     trajectory.begin(), trajectory.end(), std::back_inserter(vehicle_footprints),
-    [&](const auto & p) -> LinearRing2d {
+    [&](const auto & p) -> std::pair<LinearRing2d, Pose> {
       using autoware_utils::transform_vector;
       using autoware_utils::pose2transform;
-      return transform_vector(local_vehicle_footprint, pose2transform(p.pose));
+      return {transform_vector(local_vehicle_footprint, pose2transform(p.pose)), p.pose};
     });
 
   return vehicle_footprints;
 }
 
-EgoFootprintsSides get_ego_footprints_sides(const std::vector<LinearRing2d> & footprints_with_pose)
+EgoFootprintsSides get_ego_footprints_sides(
+  const std::vector<std::pair<LinearRing2d, Pose>> & footprints_with_pose)
 {
+  if (footprints_with_pose.empty()) {
+    return {};
+  }
+
   EgoFootprintsSides footprints_sides;
   footprints_sides.reserve(footprints_with_pose.size());
-  for (const auto & fp : footprints_with_pose) {
-    EgoFootprintSide footprint_side;
-    const Point2d right_front(fp.at(1).x(), fp.at(1).y());
-    const Point2d right_rear(fp.at(3).x(), fp.at(3).y());
-    footprint_side.right = {right_front, right_rear};
+  const auto create_footprint_side = [](const LinearRing2d & fp) {
+    EgoFootprintSide side;
+    side.right = {Point2d(fp.at(1).x(), fp.at(1).y()), Point2d(fp.at(3).x(), fp.at(3).y())};
+    side.left = {Point2d(fp.at(6).x(), fp.at(6).y()), Point2d(fp.at(4).x(), fp.at(4).y())};
+    return side;
+  };
 
-    const Point2d left_front(fp.at(6).x(), fp.at(6).y());
-    const Point2d left_rear(fp.at(4).x(), fp.at(4).y());
-    footprint_side.left = {left_front, left_rear};
+  {
+    const auto & [fp, pose] = footprints_with_pose.front();
+    EgoFootprintSide footprint_side = create_footprint_side(fp);
+    footprints_sides.push_back(footprint_side);
+  }
+
+  for (size_t i = 1; i < footprints_with_pose.size(); ++i) {
+    const auto & [fp, pose] = footprints_with_pose.at(i);
+    EgoFootprintSide footprint_side = create_footprint_side(fp);
+    const auto & [prev_fp, prev_pose] = footprints_with_pose.at(i - 1);
+    footprint_side.dist_from_start += autoware_utils::calc_distance2d(prev_pose, pose);
     footprints_sides.push_back(footprint_side);
   }
 
   return footprints_sides;
 }
+
+param::DepartureStatus check_departure_status(
+  const SideToBoundary & side_near_boundary, const param::NodeParam & param)
+{
+  for (const auto & left : side_near_boundary.left) {
+    const auto & [projection, departed_segment] = left;
+    const auto & [p_orig, p_proj, dist] = projection;
+    if (std::abs(dist) < param.stop_before_departure.th_dist_to_boundary_m.left) {
+      return param::DepartureStatus::CRITICAL_DEPARTURE;
+    }
+
+    if (std::abs(dist) < param.slow_down_before_departure.th_dist_to_boundary_m.left) {
+      return param::DepartureStatus::APPROACHING_DEPARTURE;
+    }
+
+    if (std::abs(dist) < param.slow_down_near_boundary.th_dist_to_boundary_m.left) {
+      return param::DepartureStatus::NEAR_BOUNDARY;
+    }
+  }
+
+  for (const auto & right : side_near_boundary.right) {
+    const auto & [projection, departed_segment] = right;
+    const auto & [p_orig, p_proj, dist] = projection;
+    if (std::abs(dist) < param.stop_before_departure.th_dist_to_boundary_m.right) {
+      return param::DepartureStatus::CRITICAL_DEPARTURE;
+    }
+
+    if (std::abs(dist) < param.slow_down_before_departure.th_dist_to_boundary_m.right) {
+      return param::DepartureStatus::APPROACHING_DEPARTURE;
+    }
+
+    if (std::abs(dist) < param.slow_down_near_boundary.th_dist_to_boundary_m.right) {
+      return param::DepartureStatus::NEAR_BOUNDARY;
+    }
+  }
+
+  return param::DepartureStatus::NORMAL;
+}
+
 }  // namespace autoware::motion_velocity_planner::utils

@@ -18,6 +18,7 @@
 #include "utils.hpp"
 
 #include <autoware/boundary_departure_checker/utils.hpp>
+#include <magic_enum.hpp>
 
 #include <fmt/format.h>
 
@@ -88,7 +89,7 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
   const auto output_opt = plan(
     planner_data->current_odometry.pose, ego_pred_traj_ptr_->points, vehicle_info,
     node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
-    node_param_.boundary_types_to_detect);
+    node_param_.boundary_types_to_detect, node_param_);
   if (!output_opt) {
     fmt::print("Invalid output\n");
     return {};
@@ -105,7 +106,7 @@ std::optional<Output> BoundaryDeparturePreventionModule::plan(
   const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
   const VehicleInfo & vehicle_info, const double footprint_margin_scale,
   const lanelet::LaneletMap & lanelet_map,
-  const std::vector<std::string> & boundary_types_to_detect)
+  const std::vector<std::string> & boundary_types_to_detect, const param::NodeParam & param)
 {
   Output output;
 
@@ -126,6 +127,11 @@ std::optional<Output> BoundaryDeparturePreventionModule::plan(
   output.side_near_boundary = lane_departure_checker::utils::get_closest_boundary_from_side(
     lanelet_map, output.ego_footprints_sides, boundary_types_to_detect);
   output.processing_time_map["get_closest_boundary_from_side"] = stop_watch.toc(true);
+  fmt::print("{}\n", output.processing_time_map["get_closest_boundary_from_side"]);
+
+  const auto departure_status = utils::check_departure_status(output.side_near_boundary, param);
+
+  fmt::print("{}\n", magic_enum::enum_name(departure_status));
 
   return output;
 }

@@ -21,10 +21,14 @@
 
 namespace autoware::motion_velocity_planner::utils
 {
-std::optional<std::vector<LinearRing2d>> create_vehicle_footprints(
+std::optional<std::vector<std::pair<LinearRing2d, Pose>>> create_vehicle_footprints(
   const geometry_msgs::msg::PoseWithCovariance & covariance, const TrajectoryPoints & trajectory,
   const VehicleInfo & vehicle_info, const double footprint_margin_scale);
 
-EgoFootprintsSides get_ego_footprints_sides(const std::vector<LinearRing2d> & footprints_with_pose);
+EgoFootprintsSides get_ego_footprints_sides(
+  const std::vector<std::pair<LinearRing2d, Pose>> & footprints_with_pose);
+
+param::DepartureStatus check_departure_status(
+  const SideToBoundary & side_near_boundary, const param::NodeParam & param);
 }  // namespace autoware::motion_velocity_planner::utils
 #endif  // UTILS_HPP_

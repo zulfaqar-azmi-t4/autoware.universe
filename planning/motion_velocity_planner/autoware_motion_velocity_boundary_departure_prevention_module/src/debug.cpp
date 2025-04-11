@@ -43,7 +43,7 @@ Marker create_ego_sides_marker(
   marker.ns = ns;
   marker.points.reserve(ego_footprints_sides.size() * 4);
   const auto to_geom = [base_link_z](const auto & pt) { return to_msg(pt.to_3d(base_link_z)); };
-  for (const auto & [left, right] : ego_footprints_sides) {
+  for (const auto & [left, right, dist] : ego_footprints_sides) {
     marker.points.push_back(to_geom(left.first));
     marker.points.push_back(to_geom(left.second));
     marker.points.push_back(to_geom(right.first));
