@@ -493,14 +493,12 @@ SideToBoundary get_closest_boundary_from_side(
         boundary_types_to_detect.end());
   };
 
-  SideToBoundary side;
-
   const auto project_closest = [&](
                                  const Segment2d & ego_seg, bool is_target_left,
                                  std::vector<ProjectionWithSegment> & output_side, size_t idx) {
     std::optional<Projection> closest_proj;
     Segment2d closest_seg;
-    double min_dist = std::numeric_limits<double>::max();
+    double min_dist = 20.0;
     const lanelet::BasicPoint2d ego_start{ego_seg.first.x(), ego_seg.first.y()};
     const lanelet::BasicSegment2d ego_line{ego_seg.first, ego_seg.second};
 
@@ -548,6 +546,10 @@ SideToBoundary get_closest_boundary_from_side(
     }
   };
 
+  SideToBoundary side;
+  side.left.reserve(ego_footprints_sides.size());
+  side.right.reserve(ego_footprints_sides.size());
+
   for (size_t i = 0; i < ego_footprints_sides.size(); ++i) {
     const auto & ego = ego_footprints_sides[i];
     // Use the lambda for both left and right
@@ -555,7 +557,6 @@ SideToBoundary get_closest_boundary_from_side(
     project_closest(ego.right, false, side.right, i);  // Right side
   }
 
-  fmt::print("Size of left side: {}, right side: {}\n", side.left.size(), side.right.size());
   return side;
 }
 

@@ -15,7 +15,7 @@
 #ifndef DEBUG_HPP_
 #define DEBUG_HPP_
 
-#include "type_alias.hpp"
+#include "parameters.hpp"
 
 namespace autoware::motion_velocity_planner::debug
 {

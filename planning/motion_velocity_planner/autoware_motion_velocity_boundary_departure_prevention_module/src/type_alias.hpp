@@ -65,6 +65,7 @@ using autoware_utils::to_msg;
 using autoware_utils_geometry::Point2d;
 using lane_departure_checker::Output;
 using lane_departure_checker::Projection;
+using lane_departure_checker::ProjectionWithSegment;
 using vehicle_info_utils::VehicleInfo;
 // NOLINTEND(misc-unused-using-decls)
 

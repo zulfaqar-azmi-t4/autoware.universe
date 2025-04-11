@@ -101,42 +101,50 @@ EgoFootprintsSides get_ego_footprints_sides(
   return footprints_sides;
 }
 
-param::DepartureStatus check_departure_status(
+param::DepartureStatusesIdx check_departure_status(
   const SideToBoundary & side_near_boundary, const param::NodeParam & param)
 {
+  param::DepartureStatusesIdx stats;
   for (const auto & left : side_near_boundary.left) {
-    const auto & [projection, departed_segment] = left;
+    const auto & [projection, departed_segment, idx_from_orig] = left;
     const auto & [p_orig, p_proj, dist] = projection;
     if (std::abs(dist) < param.stop_before_departure.th_dist_to_boundary_m.left) {
-      return param::DepartureStatus::CRITICAL_DEPARTURE;
+      stats.left.emplace_back(param::DepartureStatus::CRITICAL_DEPARTURE, idx_from_orig);
     }
 
     if (std::abs(dist) < param.slow_down_before_departure.th_dist_to_boundary_m.left) {
-      return param::DepartureStatus::APPROACHING_DEPARTURE;
+      stats.left.emplace_back(param::DepartureStatus::APPROACHING_DEPARTURE, idx_from_orig);
     }
 
     if (std::abs(dist) < param.slow_down_near_boundary.th_dist_to_boundary_m.left) {
-      return param::DepartureStatus::NEAR_BOUNDARY;
+      stats.left.emplace_back(param::DepartureStatus::NEAR_BOUNDARY, idx_from_orig);
     }
   }
 
   for (const auto & right : side_near_boundary.right) {
-    const auto & [projection, departed_segment] = right;
+    const auto & [projection, departed_segment, idx_from_orig] = right;
     const auto & [p_orig, p_proj, dist] = projection;
     if (std::abs(dist) < param.stop_before_departure.th_dist_to_boundary_m.right) {
-      return param::DepartureStatus::CRITICAL_DEPARTURE;
+      stats.right.emplace_back(param::DepartureStatus::CRITICAL_DEPARTURE, idx_from_orig);
     }
 
     if (std::abs(dist) < param.slow_down_before_departure.th_dist_to_boundary_m.right) {
-      return param::DepartureStatus::APPROACHING_DEPARTURE;
+      stats.right.emplace_back(param::DepartureStatus::APPROACHING_DEPARTURE, idx_from_orig);
     }
 
     if (std::abs(dist) < param.slow_down_near_boundary.th_dist_to_boundary_m.right) {
-      return param::DepartureStatus::NEAR_BOUNDARY;
+      stats.right.emplace_back(param::DepartureStatus::NEAR_BOUNDARY, idx_from_orig);
     }
   }
 
-  return param::DepartureStatus::NORMAL;
+  return stats;
 }
 
+double calc_braking_distance(
+  const double abs_velocity, const double max_deceleration, const double delay_time,
+  const double dist_error)
+{
+  return (abs_velocity * abs_velocity) / (2.0 * max_deceleration) + delay_time * abs_velocity +
+         dist_error;
+}
 }  // namespace autoware::motion_velocity_planner::utils

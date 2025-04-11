@@ -28,7 +28,11 @@ std::optional<std::vector<std::pair<LinearRing2d, Pose>>> create_vehicle_footpri
 EgoFootprintsSides get_ego_footprints_sides(
   const std::vector<std::pair<LinearRing2d, Pose>> & footprints_with_pose);
 
-param::DepartureStatus check_departure_status(
+param::DepartureStatusesIdx check_departure_status(
   const SideToBoundary & side_near_boundary, const param::NodeParam & param);
+
+double calc_braking_distance(
+  const double abs_velocity, const double max_deceleration, const double delay_time,
+  const double dist_error);
 }  // namespace autoware::motion_velocity_planner::utils
 #endif  // UTILS_HPP_

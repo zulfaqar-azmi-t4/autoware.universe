@@ -54,6 +54,11 @@ struct Side
 {
   T left;
   T right;
+};
+
+template <typename T>
+struct SideWithDist : Side<T>
+{
   double dist_from_start{0.0};
 };
 
@@ -62,13 +67,18 @@ struct ProjectionWithSegment
   Projection projection;
   Segment2d nearest_segment;
   size_t idx_from_ego_footprints_sides{0};
+  ProjectionWithSegment() = default;
+  ProjectionWithSegment(Projection proj, Segment2d seg, size_t idx)
+  : projection(std::move(proj)), nearest_segment(std::move(seg)), idx_from_ego_footprints_sides(idx)
+  {
+  }
 };
 
 using SideProjOpt = Side<std::optional<Projection>>;
-using EgoFootprintSide = Side<Segment2d>;
 using BoundarySide = Side<std::vector<Segment2d>>;
-using EgoFootprintsSides = std::vector<EgoFootprintSide>;
 using SideToBoundary = Side<std::vector<ProjectionWithSegment>>;
+using EgoFootprintSide = SideWithDist<Segment2d>;
+using EgoFootprintsSides = std::vector<EgoFootprintSide>;
 
 struct Param
 {

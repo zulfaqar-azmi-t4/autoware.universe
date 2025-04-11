@@ -43,9 +43,11 @@ Marker create_ego_sides_marker(
   marker.ns = ns;
   marker.points.reserve(ego_footprints_sides.size() * 4);
   const auto to_geom = [base_link_z](const auto & pt) { return to_msg(pt.to_3d(base_link_z)); };
-  for (const auto & [left, right, dist] : ego_footprints_sides) {
+  for (const auto & ego_footprint_sides : ego_footprints_sides) {
+    const auto & left = ego_footprint_sides.left;
     marker.points.push_back(to_geom(left.first));
     marker.points.push_back(to_geom(left.second));
+    const auto & right = ego_footprint_sides.right;
     marker.points.push_back(to_geom(right.first));
     marker.points.push_back(to_geom(right.second));
   }
@@ -54,12 +56,12 @@ Marker create_ego_sides_marker(
 }
 
 Marker create_side_to_boundary_marker(
-  const std::vector<std::pair<Projection, Segment2d>> & side_to_boundary, Marker marker,
-  std::string && ns, const double base_link_z)
+  const std::vector<ProjectionWithSegment> & side_to_boundary, Marker marker, std::string && ns,
+  const double base_link_z)
 {
   marker.ns = ns;
   const auto to_geom = [base_link_z](const auto & pt) { return to_msg(pt.to_3d(base_link_z)); };
-  for (const auto & [projection, segment] : side_to_boundary) {
+  for (const auto & [projection, segment, dist_from_start] : side_to_boundary) {
     const auto & [orig, proj, dist] = projection;
     marker.color = color::blue();
     marker.points.push_back(to_geom(orig));

@@ -86,8 +86,11 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
     return {};
   }
 
+  constexpr double min_velocity = 0.01;
+  const auto & raw_abs_velocity = std::abs(curr_twist.linear.x);
+  const auto abs_velocity = raw_abs_velocity < min_velocity ? 0.0 : raw_abs_velocity;
   const auto output_opt = plan(
-    planner_data->current_odometry.pose, ego_pred_traj_ptr_->points, vehicle_info,
+    planner_data->current_odometry.pose, abs_velocity, ego_pred_traj_ptr_->points, vehicle_info,
     node_param_.pred_path_footprint.scale, *planner_data->route_handler->getLaneletMapPtr(),
     node_param_.boundary_types_to_detect, node_param_);
   if (!output_opt) {
@@ -103,9 +106,9 @@ VelocityPlanningResult BoundaryDeparturePreventionModule::plan(
 }
 
 std::optional<Output> BoundaryDeparturePreventionModule::plan(
-  const PoseWithCovariance & pose_with_covariance, const TrajectoryPoints & ego_pred_traj,
-  const VehicleInfo & vehicle_info, const double footprint_margin_scale,
-  const lanelet::LaneletMap & lanelet_map,
+  const PoseWithCovariance & pose_with_covariance, const double abs_velocity,
+  const TrajectoryPoints & ego_pred_traj, const VehicleInfo & vehicle_info,
+  const double footprint_margin_scale, const lanelet::LaneletMap & lanelet_map,
   const std::vector<std::string> & boundary_types_to_detect, const param::NodeParam & param)
 {
   Output output;
@@ -124,14 +127,38 @@ std::optional<Output> BoundaryDeparturePreventionModule::plan(
   output.ego_footprints_sides = utils::get_ego_footprints_sides(*footprints_with_pose);
   output.processing_time_map["get_ego_footprints_sides"] = stop_watch.toc(true);
 
+  stop_watch.tic("get_closest_boundary_from_side");
   output.side_near_boundary = lane_departure_checker::utils::get_closest_boundary_from_side(
     lanelet_map, output.ego_footprints_sides, boundary_types_to_detect);
-  output.processing_time_map["get_closest_boundary_from_side"] = stop_watch.toc(true);
-  fmt::print("{}\n", output.processing_time_map["get_closest_boundary_from_side"]);
+  fmt::print("{}\n", stop_watch.toc("get_closest_boundary_from_side"));
 
-  const auto departure_status = utils::check_departure_status(output.side_near_boundary, param);
+  const auto [left_departure_statuses, right_departure_statuses] =
+    utils::check_departure_status(output.side_near_boundary, param);
 
-  fmt::print("{}\n", magic_enum::enum_name(departure_status));
+  [[maybe_unused]] auto left_remove_itr = std::remove_if(
+    left_departure_statuses.begin(), left_departure_statuses.end(),
+    [&](const param::DepartureStatusIdx & side) {
+      const auto [status, idx] = side;
+      const auto dist_to_start = output.ego_footprints_sides.at(idx).dist_from_start;
+      const auto is_far = [&](const auto & param) {
+        const auto braking_dist = utils::calc_braking_distance(
+          abs_velocity, param.th_trigger.decel_mp2, param.th_trigger.brake_delay_s,
+          param.th_trigger.dist_error_m);
+        return (braking_dist > dist_to_start);
+      };
+      if (status == param::DepartureStatus::CRITICAL_DEPARTURE) {
+        return is_far(param.stop_before_departure);
+      }
+
+      if (status == param::DepartureStatus::APPROACHING_DEPARTURE) {
+        return is_far(param.slow_down_before_departure);
+      }
+
+      if (status == param::DepartureStatus::NEAR_BOUNDARY) {
+        return is_far(param.slow_down_near_boundary);
+      }
+      return true;
+    });
 
   return output;
 }

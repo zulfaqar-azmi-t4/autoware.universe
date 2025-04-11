@@ -26,11 +26,18 @@
 namespace autoware::motion_velocity_planner::param
 {
 using autoware_utils::get_or_declare_parameter;
+struct BehaviorTriggerThreshold
+{
+  double decel_mp2{-1.0};
+  double brake_delay_s{1.0};
+  double dist_error_m{0.25};
+};
 struct BoundaryBehaviorTrigger
 {
   bool enable{true};
   BoundaryThreshold th_dist_to_boundary_m{
     std::numeric_limits<double>::max(), std::numeric_limits<double>::max()};
+  BehaviorTriggerThreshold th_trigger;
 };
 
 struct PredictedPathFootprint
@@ -47,6 +54,8 @@ struct FootprintMargin
 };
 
 enum class DepartureStatus { NORMAL = 0, NEAR_BOUNDARY, APPROACHING_DEPARTURE, CRITICAL_DEPARTURE };
+using DepartureStatusIdx = std::pair<DepartureStatus, size_t>;
+using DepartureStatusesIdx = lane_departure_checker::Side<std::vector<DepartureStatusIdx>>;
 
 struct NodeParam
 {
@@ -69,13 +78,24 @@ struct NodeParam
 
     auto boundary_behaviour_trigger_param = [&node,
                                              &module_name](const std::string & trigger_type_str) {
-      BoundaryBehaviorTrigger trigger;
+      BoundaryThreshold th_dist_to_boundary_m;
       const std::string ns{module_name + trigger_type_str + "."};
+      const std::string ns_bound = ns + "th_dist_to_boundary_m.";
+      th_dist_to_boundary_m.left = get_or_declare_parameter<double>(node, ns_bound + "left");
+      th_dist_to_boundary_m.right = get_or_declare_parameter<double>(node, ns_bound + "right");
+
+      BehaviorTriggerThreshold th_behavior;
+      const std::string ns_behavior{ns + "th_trigger."};
+      th_behavior.decel_mp2 = get_or_declare_parameter<double>(node, ns_behavior + "decel_mp2");
+      th_behavior.brake_delay_s =
+        get_or_declare_parameter<double>(node, ns_behavior + "brake_delay_s");
+      th_behavior.dist_error_m =
+        get_or_declare_parameter<double>(node, ns_behavior + "dist_error_m");
+
+      BoundaryBehaviorTrigger trigger;
       trigger.enable = get_or_declare_parameter<bool>(node, ns + "enable");
-      trigger.th_dist_to_boundary_m.left =
-        get_or_declare_parameter<double>(node, ns + "th_dist_to_boundary_m.left");
-      trigger.th_dist_to_boundary_m.right =
-        get_or_declare_parameter<double>(node, ns + "th_dist_to_boundary_m.right");
+      trigger.th_dist_to_boundary_m = th_dist_to_boundary_m;
+      trigger.th_trigger = th_behavior;
       return trigger;
     };
 
