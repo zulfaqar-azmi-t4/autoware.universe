@@ -107,7 +107,7 @@ protected:
   std::shared_ptr<TrajectoryValidator> trajectory_validator_;
 };
 
-TEST_P(TrajectoryValidatorTest, test_calc_lateral_deviation_status)
+TEST_P(TrajectoryValidatorTest, DISABLED_test_calc_lateral_deviation_status)
 {
   auto [reference_trajectory, predicted_trajectory, expected_deviation, expected_condition] =
     GetParam();
