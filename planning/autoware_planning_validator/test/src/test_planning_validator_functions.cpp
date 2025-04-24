@@ -18,6 +18,8 @@
 #include "test_parameter.hpp"
 #include "test_planning_validator_helper.hpp"
 
+#include <autoware_utils/geometry/geometry.hpp>
+
 #include <gtest/gtest.h>
 
 #include <memory>
