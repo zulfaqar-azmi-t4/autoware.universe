@@ -69,11 +69,10 @@ struct StopObstacle
   {
   }
   StopObstacle(
-    const rclcpp::Time & arg_stamp, const bool arg_is_point_cloud,
-    const double arg_lon_velocity, const geometry_msgs::msg::Point & arg_collision_point,
+    const rclcpp::Time & arg_stamp, const bool arg_is_point_cloud, const double arg_lon_velocity,
+    const geometry_msgs::msg::Point & arg_collision_point,
     const double arg_dist_to_collide_on_decimated_traj, const double arg_braking_dist = 0.0)
-  :
-    stamp(arg_stamp),
+  : stamp(arg_stamp),
     velocity(arg_lon_velocity),
     collision_point(arg_collision_point),
     dist_to_collide_on_decimated_traj(arg_dist_to_collide_on_decimated_traj),
