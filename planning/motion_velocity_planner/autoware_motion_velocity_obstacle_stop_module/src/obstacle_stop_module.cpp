@@ -206,7 +206,6 @@ VelocityPlanningResult ObstacleStopModule::plan(
     StopPlanningDebugInfo::TYPE::EGO_ACCELERATION,
     planner_data->current_acceleration.accel.accel.linear.x);
   trajectory_polygon_for_inside_map_.clear();
-  trajectory_polygon_for_outside_ = std::nullopt;
   decimated_traj_polys_ = std::nullopt;
 
   // 2. pre-process
@@ -221,8 +220,8 @@ VelocityPlanningResult ObstacleStopModule::plan(
     planner_data->current_odometry, planner_data->ego_nearest_dist_threshold,
     planner_data->ego_nearest_yaw_threshold,
     rclcpp::Time(planner_data->predicted_objects_header.stamp), raw_trajectory_points,
-    decimated_traj_points, planner_data->objects, planner_data->is_driving_forward,
-    planner_data->vehicle_info_, dist_to_bumper, planner_data->trajectory_polygon_collision_check);
+    decimated_traj_points, planner_data->objects, planner_data->vehicle_info_, dist_to_bumper,
+    planner_data->trajectory_polygon_collision_check);
 
   // 4. filter obstacles of point cloud
   auto stop_obstacles_for_point_cloud = filter_stop_obstacle_for_point_cloud(
@@ -364,7 +363,7 @@ std::vector<StopObstacle> ObstacleStopModule::filter_stop_obstacle_for_predicted
   const double ego_nearest_yaw_threshold, const rclcpp::Time & predicted_objects_stamp,
   const std::vector<TrajectoryPoint> & traj_points,
   const std::vector<TrajectoryPoint> & decimated_traj_points,
-  const std::vector<std::shared_ptr<PlannerData::Object>> & objects, const bool is_driving_forward,
+  const std::vector<std::shared_ptr<PlannerData::Object>> & objects,
   const VehicleInfo & vehicle_info, const double dist_to_bumper,
   const TrajectoryPolygonCollisionCheck & trajectory_polygon_collision_check)
 {
@@ -385,11 +384,13 @@ std::vector<StopObstacle> ObstacleStopModule::filter_stop_obstacle_for_predicted
     }
 
     // 1.2. Check if the rough lateral distance is smaller than the threshold.
-    // TODO(murooka) outside obstacle stop was removed.
     const double min_lat_dist_to_traj_poly =
       utils::calc_possible_min_dist_from_obj_to_traj_poly(object, traj_points, vehicle_info);
     const uint8_t obj_label = object->predicted_object.classification.at(0).label;
-    if (get_max_lat_margin(obj_label) < min_lat_dist_to_traj_poly) {
+    if (
+      get_max_lat_margin(obj_label) <
+      min_lat_dist_to_traj_poly - object->get_lat_vel_relative_to_traj(traj_points) *
+                                    obstacle_filtering_param_.outside_estimation_time_horizon) {
       continue;
     }
 
@@ -407,22 +408,13 @@ std::vector<StopObstacle> ObstacleStopModule::filter_stop_obstacle_for_predicted
       return object->get_dist_to_traj_poly(decimated_traj_polys);
     }();
 
-    // 2.1. filter target object inside trajectory
-    const auto inside_stop_obstacle = filter_inside_stop_obstacle_for_predicted_object(
+    // 2.1. pick target object
+    const auto current_step_stop_obstacle = pick_stop_obstacle_from_predicted_object(
       odometry, traj_points, decimated_traj_points, object, predicted_objects_stamp,
       dist_from_obj_to_traj_poly, vehicle_info, dist_to_bumper, trajectory_polygon_collision_check);
-    if (inside_stop_obstacle) {
-      stop_obstacles.push_back(*inside_stop_obstacle);
+    if (current_step_stop_obstacle) {
+      stop_obstacles.push_back(*current_step_stop_obstacle);
       continue;
-    }
-
-    // 2.2 filter target object outside trajectory
-    const auto outside_stop_obstacle = filter_outside_stop_obstacle_for_predicted_object(
-      odometry, traj_points, decimated_traj_points, predicted_objects_stamp, object,
-      dist_from_obj_to_traj_poly, is_driving_forward, vehicle_info, dist_to_bumper,
-      trajectory_polygon_collision_check);
-    if (outside_stop_obstacle) {
-      stop_obstacles.push_back(*outside_stop_obstacle);
     }
   }
 
@@ -507,7 +499,7 @@ std::vector<StopObstacle> ObstacleStopModule::filter_stop_obstacle_for_point_clo
   return stop_obstacles;
 }
 
-std::optional<StopObstacle> ObstacleStopModule::filter_inside_stop_obstacle_for_predicted_object(
+std::optional<StopObstacle> ObstacleStopModule::pick_stop_obstacle_from_predicted_object(
   const Odometry & odometry, const std::vector<TrajectoryPoint> & traj_points,
   const std::vector<TrajectoryPoint> & decimated_traj_points,
   const std::shared_ptr<PlannerData::Object> object, const rclcpp::Time & predicted_objects_stamp,
@@ -526,10 +518,38 @@ std::optional<StopObstacle> ObstacleStopModule::filter_inside_stop_obstacle_for_
     return std::nullopt;
   }
 
+  const auto estimation_time = [&]() {
+    if (!is_in_vector(obj_label, obstacle_filtering_param_.outside_stop_object_types)) {
+      return 0.0;
+    }
+    const auto equivalent_esimation_time = [&predicted_object](double deceleration_rate) {
+      if (deceleration_rate <= std::numeric_limits<double>::epsilon()) {
+        return 0.0;
+      }
+      const auto twist = predicted_object.kinematics.initial_twist_with_covariance.twist;
+      return std::hypot(twist.linear.x, twist.linear.y) * 0.5 / deceleration_rate;
+    };
+    switch (obj_label) {
+      case ObjectClassification::PEDESTRIAN:
+        return std::clamp(
+          equivalent_esimation_time(obstacle_filtering_param_.outside_pedestrian_deceleration_rate),
+          0.0, obstacle_filtering_param_.outside_estimation_time_horizon);
+      case ObjectClassification::BICYCLE:
+        return std::clamp(
+          equivalent_esimation_time(obstacle_filtering_param_.outside_bicycle_deceleration_rate),
+          0.0, obstacle_filtering_param_.outside_estimation_time_horizon);
+      default:
+        return obstacle_filtering_param_.outside_estimation_time_horizon;
+    }
+  }();
+
   // 2. filter by lateral distance
   const double max_lat_margin = get_max_lat_margin(obj_label);
   // NOTE: max_lat_margin can be negative, so apply std::max with 1e-3.
-  if (std::max(max_lat_margin, 1e-3) <= dist_from_obj_poly_to_traj_poly) {
+  if (
+    std::max(max_lat_margin, 1e-3) <=
+    dist_from_obj_poly_to_traj_poly -
+      std::abs(object->get_lat_vel_relative_to_traj(traj_points) * estimation_time)) {
     return std::nullopt;
   }
 
@@ -546,9 +566,18 @@ std::optional<StopObstacle> ObstacleStopModule::filter_inside_stop_obstacle_for_
   debug_data_ptr_->decimated_traj_polys = decimated_traj_polys_with_lat_margin;
 
   // 4. check if the obstacle really collides with the trajectory
-  const auto collision_point = polygon_utils::get_collision_point(
+  auto collision_point = polygon_utils::get_collision_point(
     decimated_traj_points, decimated_traj_polys_with_lat_margin, obj_pose, clock_->now(),
     predicted_object.shape, dist_to_bumper);
+
+  if (!collision_point) {
+    const auto & future_obj_pose = object->get_specified_time_pose(
+      clock_->now() + rclcpp::Duration::from_seconds(estimation_time), predicted_objects_stamp);
+    collision_point = polygon_utils::get_collision_point(
+      decimated_traj_points, decimated_traj_polys_with_lat_margin, future_obj_pose, clock_->now(),
+      predicted_object.shape, dist_to_bumper);
+  }
+
   if (!collision_point) {
     return std::nullopt;
   }
@@ -562,6 +591,26 @@ std::optional<StopObstacle> ObstacleStopModule::filter_inside_stop_obstacle_for_
     return std::nullopt;
   }
 
+  const auto braking_dist = [&]() {
+    double braking_acc = [&]() {
+      switch (obj_label) {
+        case ObjectClassification::UNKNOWN:
+        case ObjectClassification::PEDESTRIAN:
+          return -std::numeric_limits<double>::infinity();
+        case ObjectClassification::BICYCLE:
+        case ObjectClassification::MOTORCYCLE:
+          return stop_planning_param_.rss_params.two_wheel_objects_deceleration;
+        default:
+          return stop_planning_param_.rss_params.other_vehicle_objects_deceleration;
+      }
+    }();
+    double error_considered_vel = std::max(
+      object->get_lon_vel_relative_to_traj(traj_points) +
+        stop_planning_param_.rss_params.velocity_offset,
+      0.0);
+    return error_considered_vel * error_considered_vel * 0.5 / -braking_acc;
+  }();
+
   return StopObstacle{
     autoware_utils::to_hex_string(predicted_object.object_id),
     predicted_objects_stamp,
@@ -570,7 +619,8 @@ std::optional<StopObstacle> ObstacleStopModule::filter_inside_stop_obstacle_for_
     predicted_object.shape,
     object->get_lon_vel_relative_to_traj(traj_points),
     collision_point->first,
-    collision_point->second};
+    collision_point->second,
+    braking_dist};
 }
 
 bool ObstacleStopModule::is_inside_stop_obstacle_velocity(
@@ -651,154 +701,6 @@ bool ObstacleStopModule::is_crossing_transient_obstacle(
   return no_collision;
 }
 
-std::optional<StopObstacle> ObstacleStopModule::filter_outside_stop_obstacle_for_predicted_object(
-  const Odometry & odometry, const std::vector<TrajectoryPoint> & traj_points,
-  const std::vector<TrajectoryPoint> & decimated_traj_points,
-  const rclcpp::Time & predicted_objects_stamp, const std::shared_ptr<PlannerData::Object> object,
-  const double dist_from_obj_poly_to_traj_poly, const bool is_driving_forward,
-  const VehicleInfo & vehicle_info, const double dist_to_bumper,
-  const TrajectoryPolygonCollisionCheck & trajectory_polygon_collision_check) const
-{
-  autoware_utils::ScopedTimeTrack st(__func__, *time_keeper_);
-
-  const auto & object_id = autoware_utils::to_hex_string(object->predicted_object.object_id);
-
-  // 1. filter by label
-  const uint8_t obj_label = object->predicted_object.classification.at(0).label;
-  if (!is_in_vector(obj_label, obstacle_filtering_param_.outside_stop_object_types)) {
-    return std::nullopt;
-  }
-
-  // 2. filter by lateral distance
-  const double max_lat_margin = get_max_lat_margin(obj_label);
-  if (dist_from_obj_poly_to_traj_poly < std::max(max_lat_margin, 1e-3)) {
-    // Obstacle that is not inside of trajectory
-    return std::nullopt;
-  }
-
-  const auto time_to_traj = dist_from_obj_poly_to_traj_poly /
-                            std::max(1e-6, object->get_lat_vel_relative_to_traj(traj_points));
-  if (time_to_traj > obstacle_filtering_param_.outside_max_lat_time_margin) {
-    RCLCPP_DEBUG(
-      logger_, "[Stop] Ignore outside obstacle (%s) since it's far from trajectory.",
-      object_id.substr(0, 4).c_str());
-    return std::nullopt;
-  }
-
-  // brkay54: For the pedestrians and bicycles, we need to check the collision point by thinking
-  // they will stop with a predefined deceleration rate to avoid unnecessary stops.
-  double resample_time_horizon = 10.0;
-  if (obj_label == ObjectClassification::PEDESTRIAN) {
-    resample_time_horizon =
-      std::sqrt(
-        std::pow(
-          object->predicted_object.kinematics.initial_twist_with_covariance.twist.linear.x, 2) +
-        std::pow(
-          object->predicted_object.kinematics.initial_twist_with_covariance.twist.linear.y, 2)) /
-      (2.0 * obstacle_filtering_param_.outside_pedestrian_deceleration_rate);
-  } else if (obj_label == ObjectClassification::BICYCLE) {
-    resample_time_horizon =
-      std::sqrt(
-        std::pow(
-          object->predicted_object.kinematics.initial_twist_with_covariance.twist.linear.x, 2) +
-        std::pow(
-          object->predicted_object.kinematics.initial_twist_with_covariance.twist.linear.y, 2)) /
-      (2.0 * obstacle_filtering_param_.outside_bicycle_deceleration_rate);
-  }
-
-  // Get the highest confidence predicted path
-  std::vector<PredictedPath> predicted_paths;
-  for (const auto & path : object->predicted_object.kinematics.predicted_paths) {
-    predicted_paths.push_back(path);
-  }
-  constexpr double prediction_resampling_time_interval = 0.1;
-  const auto resampled_predicted_paths = resample_highest_confidence_predicted_paths(
-    predicted_paths, prediction_resampling_time_interval, resample_time_horizon,
-    obstacle_filtering_param_.outside_num_of_predicted_paths);
-  if (resampled_predicted_paths.empty()) {
-    return std::nullopt;
-  }
-
-  const auto & p = trajectory_polygon_collision_check;
-  const auto decimated_traj_polys_with_lat_margin = get_trajectory_polygon_for_outside(
-    decimated_traj_points, vehicle_info, odometry.pose.pose, 0.0, p.enable_to_consider_current_pose,
-    p.time_to_convergence, p.decimate_trajectory_step_length);
-
-  const auto get_collision_point =
-    [&]() -> std::optional<std::pair<geometry_msgs::msg::Point, double>> {
-    for (const auto & predicted_path : resampled_predicted_paths) {
-      const auto collision_point = create_collision_point_for_outside_stop_obstacle(
-        odometry, traj_points, decimated_traj_points, decimated_traj_polys_with_lat_margin, object,
-        predicted_objects_stamp, predicted_path, max_lat_margin, is_driving_forward, vehicle_info,
-        dist_to_bumper, trajectory_polygon_collision_check.decimate_trajectory_step_length);
-      if (collision_point) {
-        return collision_point;
-      }
-    }
-    return std::nullopt;
-  };
-
-  const auto collision_point = get_collision_point();
-
-  if (collision_point) {
-    return StopObstacle{
-      object_id,
-      predicted_objects_stamp,
-      object->predicted_object.classification.at(0),
-      object->get_predicted_pose(clock_->now(), predicted_objects_stamp),
-      object->predicted_object.shape,
-      object->get_lon_vel_relative_to_traj(traj_points),
-      collision_point->first,
-      collision_point->second};
-  }
-  return std::nullopt;
-}
-
-std::optional<std::pair<geometry_msgs::msg::Point, double>>
-ObstacleStopModule::create_collision_point_for_outside_stop_obstacle(
-  const Odometry & odometry, const std::vector<TrajectoryPoint> & traj_points,
-  const std::vector<TrajectoryPoint> & decimated_traj_points,
-  const std::vector<Polygon2d> & decimated_traj_polys,
-  const std::shared_ptr<PlannerData::Object> object, const rclcpp::Time & predicted_objects_stamp,
-  const PredictedPath & resampled_predicted_path, double max_lat_margin,
-  const bool is_driving_forward, const VehicleInfo & vehicle_info, const double dist_to_bumper,
-  const double decimate_trajectory_step_length) const
-{
-  const auto & object_id = autoware_utils::to_hex_string(object->predicted_object.object_id);
-
-  std::vector<size_t> collision_index;
-  const auto collision_points = polygon_utils::get_collision_points(
-    decimated_traj_points, decimated_traj_polys, predicted_objects_stamp, resampled_predicted_path,
-    object->predicted_object.shape, clock_->now(), is_driving_forward, collision_index,
-    utils::calc_object_possible_max_dist_from_center(object->predicted_object.shape) +
-      decimate_trajectory_step_length +
-      std::hypot(
-        vehicle_info.vehicle_length_m, vehicle_info.vehicle_width_m * 0.5 + max_lat_margin));
-  if (collision_points.empty()) {
-    RCLCPP_DEBUG(
-      logger_,
-      "[Stop] Ignore outside obstacle (%s) since there is no collision point between the "
-      "predicted path "
-      "and the ego.",
-      object_id.substr(0, 4).c_str());
-    debug_data_ptr_->intentionally_ignored_obstacles.push_back(object);
-    return std::nullopt;
-  }
-
-  const double collision_time_margin =
-    calc_collision_time_margin(odometry, collision_points, traj_points, dist_to_bumper);
-  if (obstacle_filtering_param_.crossing_obstacle_collision_time_margin < collision_time_margin) {
-    RCLCPP_DEBUG(
-      logger_, "[Stop] Ignore outside obstacle (%s) since it will not collide with the ego.",
-      object_id.substr(0, 4).c_str());
-    debug_data_ptr_->intentionally_ignored_obstacles.push_back(object);
-    return std::nullopt;
-  }
-
-  return polygon_utils::get_collision_point(
-    decimated_traj_points, collision_index.front(), collision_points, dist_to_bumper);
-}
-
 std::optional<geometry_msgs::msg::Point> ObstacleStopModule::plan_stop(
   const std::shared_ptr<const PlannerData> planner_data,
   const std::vector<TrajectoryPoint> & traj_points,
@@ -827,7 +729,7 @@ std::optional<geometry_msgs::msg::Point> ObstacleStopModule::plan_stop(
     // calculate dist to collide
     const double dist_to_collide_on_ref_traj =
       autoware::motion_utils::calcSignedArcLength(traj_points, 0, ego_segment_idx) +
-      stop_obstacle.dist_to_collide_on_decimated_traj;
+      stop_obstacle.dist_to_collide_on_decimated_traj + stop_obstacle.braking_dist;
 
     // calculate desired stop margin
     const double desired_stop_margin = calc_desired_stop_margin(
@@ -845,8 +747,10 @@ std::optional<geometry_msgs::msg::Point> ObstacleStopModule::plan_stop(
       const bool is_same_param_types =
         (stop_obstacle.classification.label == determined_stop_obstacle->classification.label);
       if (
-        (is_same_param_types && stop_obstacle.dist_to_collide_on_decimated_traj >
-                                  determined_stop_obstacle->dist_to_collide_on_decimated_traj) ||
+        (is_same_param_types && stop_obstacle.dist_to_collide_on_decimated_traj +
+                                    stop_obstacle.dist_to_collide_on_decimated_traj >
+                                  determined_stop_obstacle->dist_to_collide_on_decimated_traj +
+                                    determined_stop_obstacle->braking_dist) ||
         (!is_same_param_types && *candidate_zero_vel_dist > determined_zero_vel_dist)) {
         continue;
       }
@@ -1162,20 +1066,6 @@ std::vector<Polygon2d> ObstacleStopModule::get_trajectory_polygon_for_inside(
   return trajectory_polygon_for_inside_map_.at(lat_margin);
 }
 
-std::vector<Polygon2d> ObstacleStopModule::get_trajectory_polygon_for_outside(
-  const std::vector<TrajectoryPoint> & decimated_traj_points, const VehicleInfo & vehicle_info,
-  const geometry_msgs::msg::Pose & current_ego_pose, const double lat_margin,
-  const bool enable_to_consider_current_pose, const double time_to_convergence,
-  const double decimate_trajectory_step_length) const
-{
-  if (!trajectory_polygon_for_outside_) {
-    trajectory_polygon_for_outside_ = polygon_utils::create_one_step_polygons(
-      decimated_traj_points, vehicle_info, current_ego_pose, lat_margin,
-      enable_to_consider_current_pose, time_to_convergence, decimate_trajectory_step_length);
-  }
-  return *trajectory_polygon_for_outside_;
-}
-
 void ObstacleStopModule::check_consistency(
   const rclcpp::Time & current_time,
   const std::vector<std::shared_ptr<PlannerData::Object>> & objects,
@@ -1311,7 +1201,8 @@ std::vector<StopObstacle> ObstacleStopModule::get_closest_stop_obstacles(
     if (itr == candidates.end()) {
       candidates.emplace_back(stop_obstacle);
     } else if (
-      stop_obstacle.dist_to_collide_on_decimated_traj < itr->dist_to_collide_on_decimated_traj) {
+      stop_obstacle.dist_to_collide_on_decimated_traj + stop_obstacle.braking_dist <
+      itr->dist_to_collide_on_decimated_traj + stop_obstacle.braking_dist) {
       *itr = stop_obstacle;
     }
   }

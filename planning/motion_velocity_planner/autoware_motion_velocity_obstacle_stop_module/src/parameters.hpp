@@ -91,8 +91,7 @@ struct ObstacleFilteringParam
   double min_velocity_to_reach_collision_point{};
   double stop_obstacle_hold_time_threshold{};
 
-  double outside_max_lat_time_margin{};
-  int outside_num_of_predicted_paths{};
+  double outside_estimation_time_horizon{};
   double outside_pedestrian_deceleration_rate{};
   double outside_bicycle_deceleration_rate{};
 
@@ -136,10 +135,8 @@ struct ObstacleFilteringParam
     stop_obstacle_hold_time_threshold = get_or_declare_parameter<double>(
       node, "obstacle_stop.obstacle_filtering.stop_obstacle_hold_time_threshold");
 
-    outside_max_lat_time_margin = get_or_declare_parameter<double>(
-      node, "obstacle_stop.obstacle_filtering.outside_obstacle.max_lateral_time_margin");
-    outside_num_of_predicted_paths = get_or_declare_parameter<int>(
-      node, "obstacle_stop.obstacle_filtering.outside_obstacle.num_of_predicted_paths");
+    outside_estimation_time_horizon = get_or_declare_parameter<double>(
+      node, "obstacle_stop.obstacle_filtering.outside_obstacle.estimation_time_horizon");
     outside_pedestrian_deceleration_rate = get_or_declare_parameter<double>(
       node, "obstacle_stop.obstacle_filtering.outside_obstacle.pedestrian_deceleration_rate");
     outside_bicycle_deceleration_rate = get_or_declare_parameter<double>(
@@ -160,6 +157,13 @@ struct StopPlanningParam
   bool enable_approaching_on_curve{};
   double additional_stop_margin_on_curve{};
   double min_stop_margin_on_curve{};
+  struct
+  {
+    bool use_rss_stop{};
+    double two_wheel_objects_deceleration{};
+    double other_vehicle_objects_deceleration{};
+    double velocity_offset{};
+  } rss_params;
 
   struct ObjectTypeSpecificParams
   {
@@ -193,6 +197,14 @@ struct StopPlanningParam
       node, "obstacle_stop.stop_planning.stop_on_curve.additional_stop_margin");
     min_stop_margin_on_curve = get_or_declare_parameter<double>(
       node, "obstacle_stop.stop_planning.stop_on_curve.min_stop_margin");
+    rss_params.use_rss_stop =
+      get_or_declare_parameter<bool>(node, "obstacle_stop.stop_planning.rss_params.use_rss_stop");
+    rss_params.two_wheel_objects_deceleration = get_or_declare_parameter<double>(
+      node, "obstacle_stop.stop_planning.rss_params.two_wheel_objects_deceleration");
+    rss_params.other_vehicle_objects_deceleration = get_or_declare_parameter<double>(
+      node, "obstacle_stop.stop_planning.rss_params.other_vehicle_objects_deceleration");
+    rss_params.velocity_offset = get_or_declare_parameter<double>(
+      node, "obstacle_stop.stop_planning.rss_params.velocity_offset");
 
     const std::string param_prefix = "obstacle_stop.stop_planning.object_type_specified_params.";
     const auto object_types =
