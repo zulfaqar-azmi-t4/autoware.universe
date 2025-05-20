@@ -170,7 +170,7 @@ private:
     const std::shared_ptr<PlannerData::Object> object, const double dist_to_bumper,
     const std::vector<Polygon2d> & decimated_traj_polys_with_lat_margin,
     const std::optional<std::pair<geometry_msgs::msg::Point, double>> & collision_point) const;
-  
+
   std::optional<std::pair<geometry_msgs::msg::Point, double>> get_nearest_collision_point(
     const std::vector<TrajectoryPoint> & traj_points, const std::vector<Polygon2d> & traj_polygons,
     const PlannerData::Pointcloud & point_cloud, const VehicleInfo & vehicle_info,
