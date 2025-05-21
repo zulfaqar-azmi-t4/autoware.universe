@@ -17,6 +17,7 @@
 
 #include <autoware/route_handler/route_handler.hpp>
 #include <autoware_utils/geometry/boost_geometry.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include <autoware_perception_msgs/msg/predicted_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
@@ -29,8 +30,6 @@
 #include <lanelet2_core/Forward.h>
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Polygon.h>
-
-#include <rclcpp/rclcpp.hpp>
 
 #include <optional>
 #include <set>
@@ -67,7 +66,7 @@ struct PlannerParam
   double stop_dist_threshold;  // [m] if a collision is detected bellow this distance ahead of ego,
                                // try to insert a stop point
   double precision;            // [m] precision when inserting a stop pose in the trajectory
-  double min_on_duration;  // [s] duration needed before a stop or slowdown point can be triggered
+  double min_on_duration;   // [s] duration needed before a stop or slowdown point can be triggered
   double min_off_duration;  // [s] duration needed before a stop or slowdown point can be removed
   double update_distance_th;  // [m] distance threshold for updating previous stop pose position
 
@@ -140,8 +139,12 @@ struct SlowdownPose
   bool is_active = false;
 
   SlowdownPose() = default;
-  SlowdownPose(const double arc_length, const rclcpp::Time start_time, const geometry_msgs::msg::Pose & pose, const bool is_active) :
-    arc_length(arc_length), start_time(start_time), pose(pose), is_active(is_active) {}
+  SlowdownPose(
+    const double arc_length, const rclcpp::Time start_time, const geometry_msgs::msg::Pose & pose,
+    const bool is_active)
+  : arc_length(arc_length), start_time(start_time), pose(pose), is_active(is_active)
+  {
+  }
 };
 
 /// @brief data related to the out of lane points

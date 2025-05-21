@@ -241,8 +241,8 @@ std::optional<geometry_msgs::msg::Pose> OutOfLaneModule::calculate_slowdown_pose
 
   if (!nearest_slowdown_pose) return {};
 
-  slowdown_pose =
-    motion_utils::calcInterpolatedPose(ego_data.trajectory_points, nearest_slowdown_pose->arc_length);
+  slowdown_pose = motion_utils::calcInterpolatedPose(
+    ego_data.trajectory_points, nearest_slowdown_pose->arc_length);
 
   return slowdown_pose;
 }
@@ -251,9 +251,10 @@ void OutOfLaneModule::update_slowdown_pose_buffer(
   const out_of_lane::EgoData & ego_data,
   const std::optional<geometry_msgs::msg::Pose> & slowdown_pose)
 {
-  const double slowdown_pose_arc_length = slowdown_pose ?
-    motion_utils::calcSignedArcLength(ego_data.trajectory_points, 0LU, slowdown_pose->position) :
-    std::numeric_limits<double>::max();
+  const double slowdown_pose_arc_length =
+    slowdown_pose
+      ? motion_utils::calcSignedArcLength(ego_data.trajectory_points, 0LU, slowdown_pose->position)
+      : std::numeric_limits<double>::max();
 
   // remove no longer valid slowdown poses in the buffer:
   //  slowdown poses that are active but have exceeded the duration threshold since last detection
@@ -264,8 +265,10 @@ void OutOfLaneModule::update_slowdown_pose_buffer(
     if (sp.is_active && sp_duration > params_.min_off_duration) continue;
     if (!sp.is_active && !slowdown_pose) continue;
 
-    sp.arc_length = motion_utils::calcSignedArcLength(ego_data.trajectory_points, 0LU, sp.pose.position);
-    if (!sp.is_active && abs(sp.arc_length - slowdown_pose_arc_length) > params_.update_distance_th) {
+    sp.arc_length =
+      motion_utils::calcSignedArcLength(ego_data.trajectory_points, 0LU, sp.pose.position);
+    if (
+      !sp.is_active && abs(sp.arc_length - slowdown_pose_arc_length) > params_.update_distance_th) {
       continue;
     }
 
@@ -356,7 +359,8 @@ VelocityPlanningResult OutOfLaneModule::plan(
 
   stopwatch.tic("calculate_times");
   const auto is_stopping = previous_slowdown_pose_ ? true : false;
-  out_of_lane::calculate_collisions_to_avoid(out_of_lane_data, ego_data.trajectory_points, params_, is_stopping);
+  out_of_lane::calculate_collisions_to_avoid(
+    out_of_lane_data, ego_data.trajectory_points, params_, is_stopping);
   const auto calculate_times_us = stopwatch.toc("calculate_times");
 
   const auto is_already_overlapping =
