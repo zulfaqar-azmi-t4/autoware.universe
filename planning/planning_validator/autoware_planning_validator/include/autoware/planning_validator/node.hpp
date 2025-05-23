@@ -36,6 +36,7 @@
 #include <diagnostic_msgs/msg/diagnostic_array.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include <memory>
 #include <string>
@@ -43,6 +44,8 @@
 namespace autoware::planning_validator
 {
 using autoware_internal_debug_msgs::msg::Float64Stamped;
+using autoware_map_msgs::msg::LaneletMapBin;
+using autoware_planning_msgs::msg::LaneletRoute;
 using autoware_planning_msgs::msg::Trajectory;
 using autoware_planning_msgs::msg::TrajectoryPoint;
 using autoware_planning_validator::msg::PlanningValidatorStatus;
@@ -51,6 +54,7 @@ using diagnostic_updater::DiagnosticStatusWrapper;
 using diagnostic_updater::Updater;
 using geometry_msgs::msg::AccelWithCovarianceStamped;
 using nav_msgs::msg::Odometry;
+using sensor_msgs::msg::PointCloud2;
 
 class PlanningValidatorNode : public rclcpp::Node
 {
@@ -70,6 +74,7 @@ private:
   void publishDebugInfo();
   void displayStatus();
 
+  // subscriber
   autoware_utils::InterProcessPollingSubscriber<Odometry> sub_kinematics_{
     this, "~/input/kinematics"};
   autoware_utils::InterProcessPollingSubscriber<AccelWithCovarianceStamped> sub_acceleration_{
@@ -84,6 +89,8 @@ private:
   autoware_utils::InterProcessPollingSubscriber<
     LaneletMapBin, autoware_utils::polling_policy::Newest>
     sub_lanelet_map_bin_{this, "~/input/lanelet_map_bin", rclcpp::QoS{1}.transient_local()};
+
+  // publisher
   rclcpp::Publisher<Trajectory>::SharedPtr pub_traj_;
   rclcpp::Publisher<PlanningValidatorStatus>::SharedPtr pub_status_;
   rclcpp::Publisher<Float64Stamped>::SharedPtr pub_processing_time_ms_;
@@ -96,6 +103,9 @@ private:
   bool is_critical_error_ = false;
 
   bool isAllValid(const PlanningValidatorStatus & status) const;
+
+  LaneletMapBin::ConstSharedPtr map_ptr_{nullptr};
+  LaneletRoute::ConstSharedPtr route_ptr_{nullptr};
 
   Trajectory::ConstSharedPtr soft_stop_trajectory_;
 

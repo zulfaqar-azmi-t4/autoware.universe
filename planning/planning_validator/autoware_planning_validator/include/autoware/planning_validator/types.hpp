@@ -37,6 +37,7 @@ namespace autoware::planning_validator
 {
 using autoware_map_msgs::msg::LaneletMapBin;
 using autoware_planning_msgs::msg::LaneletRoute;
+using autoware::route_handler::RouteHandler;
 using autoware_planning_msgs::msg::Trajectory;
 using autoware_planning_msgs::msg::TrajectoryPoint;
 using autoware_planning_validator::msg::PlanningValidatorStatus;
@@ -167,6 +168,7 @@ struct PlanningValidatorContext
   std::shared_ptr<Updater> diag_updater = nullptr;
   std::shared_ptr<PlanningValidatorData> data = nullptr;
   std::shared_ptr<PlanningValidatorStatus> validation_status = nullptr;
+  std::shared_ptr<RouteHandler> route_handler = nullptr;
 
   void set_diag_id(const std::string & id)
   {
