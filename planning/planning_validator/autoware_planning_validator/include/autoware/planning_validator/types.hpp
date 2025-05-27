@@ -30,6 +30,9 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+
 #include <memory>
 #include <string>
 
@@ -152,7 +155,9 @@ struct PlanningValidatorData
 struct PlanningValidatorContext
 {
   explicit PlanningValidatorContext(rclcpp::Node * node)
-  : vehicle_info(autoware::vehicle_info_utils::VehicleInfoUtils(*node).getVehicleInfo())
+  : vehicle_info(autoware::vehicle_info_utils::VehicleInfoUtils(*node).getVehicleInfo()),
+    tf_buffer{node->get_clock()},
+    tf_listener{tf_buffer}
   {
     debug_pose_publisher = std::make_shared<PlanningValidatorDebugMarkerPublisher>(node);
     data = std::make_shared<PlanningValidatorData>();
@@ -169,6 +174,9 @@ struct PlanningValidatorContext
   std::shared_ptr<PlanningValidatorData> data = nullptr;
   std::shared_ptr<PlanningValidatorStatus> validation_status = nullptr;
   std::shared_ptr<RouteHandler> route_handler = nullptr;
+
+  tf2_ros::Buffer tf_buffer;
+  tf2_ros::TransformListener tf_listener;
 
   void set_diag_id(const std::string & id)
   {
