@@ -104,9 +104,6 @@ private:
 
   bool isAllValid(const PlanningValidatorStatus & status) const;
 
-  LaneletMapBin::ConstSharedPtr map_ptr_{nullptr};
-  LaneletRoute::ConstSharedPtr route_ptr_{nullptr};
-
   Trajectory::ConstSharedPtr soft_stop_trajectory_;
 
   std::unique_ptr<autoware_utils::LoggerLevelConfigure> logger_configure_;
