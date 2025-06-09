@@ -39,6 +39,7 @@ struct VehicleCmdFilterParam
   LimitArray steer_lim_from_lat_jerk;
   LimitArray steer_lim;
   LimitArray cmd_steer_rate_lim;
+  double steer_rate_lim_from_lat_jerk;
   LimitArray actual_steer_diff_lim;
 };
 class VehicleCmdFilter
@@ -61,6 +62,7 @@ public:
   void limitActualSteerDiff(const double current_steer_angle, Control & input) const;
   void limitLateralSteer(Control & input) const;
   void limitLateralSteerRate(const double dt, Control & input) const;
+  void limitLateralSteerRateWithLatJerk(const double dt, Control & input) const;
   void filterAll(
     const double dt, const double current_steer_angle, Control & input,
     IsFilterActivated & is_activated) const;

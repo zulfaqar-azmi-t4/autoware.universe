@@ -88,6 +88,11 @@
           "default": [1.0, 1.0, 1.0, 0.8],
           "description": "array of limits for command steering rate (activated in AUTONOMOUS operation mode)."
         },
+        "nominal.steer_rate_lim_from_lat_jerk": {
+          "type": "number",
+          "description": "Steering rate limit based on lateral jerk [rad/s]",
+          "default": 10.0
+        },
         "nominal.actual_steer_diff_lim": {
           "type": "array",
           "items": { "type": "number" },
@@ -141,6 +146,11 @@
           "default": [1.0, 0.8],
           "description": "array of limits for command steering rate (activated in TRANSITION operation mode)."
         },
+        "on_transition.steer_rate_lim_from_lat_jerk": {
+          "type": "number",
+          "description": "Steering rate limit based on lateral jerk [rad/s]",
+          "default": 8.0
+        },
         "on_transition.actual_steer_diff_lim": {
           "type": "array",
           "items": { "type": "number" },
@@ -164,6 +174,7 @@
         "nominal.steer_lim_from_lat_acc",
         "nominal.steer_lim_from_lat_jerk",
         "nominal.cmd_steer_rate_lim",
+        "nominal.steer_rate_lim_from_lat_jerk",
         "nominal.actual_steer_diff_lim",
         "on_transition.vel_lim",
         "on_transition.reference_speed_points",
@@ -173,6 +184,7 @@
         "on_transition.steer_lim_from_lat_acc",
         "on_transition.steer_lim_from_lat_jerk",
         "on_transition.cmd_steer_rate_lim",
+        "on_transition.steer_rate_lim_from_lat_jerk",
         "on_transition.actual_steer_diff_lim"
       ]
     }

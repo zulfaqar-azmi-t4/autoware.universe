@@ -160,6 +160,31 @@ void VehicleCmdFilter::limitLateralSteerRate(const double dt, Control & input) c
   input.lateral.steering_tire_angle = prev_cmd_.lateral.steering_tire_angle + ds;
 }
 
+void VehicleCmdFilter::limitLateralSteerRateWithLatJerk(const double dt, Control & input) const
+{
+  const double steer_rate_lim_from_lat_jerk = param_.steer_rate_lim_from_lat_jerk;
+
+  // Calculate current steering rate
+  const double curr_steer_rate =
+    (input.lateral.steering_tire_angle - prev_cmd_.lateral.steering_tire_angle) / dt;
+
+  // Calculate maximum allowable steering rate based on lateral jerk constraint
+  // Using the formula: j_y = (1/L) * V^2 * (dθ/dt)
+  // Rearranging: dθ/dt = j_y * L / V^2
+  const double velocity_sq = std::max(current_speed_ * current_speed_, 0.001);
+  const double max_steer_rate_from_jerk =
+    steer_rate_lim_from_lat_jerk * param_.wheel_base / velocity_sq;
+
+  // Limit steering rate based on lateral jerk constraint
+  const double limited_steer_rate =
+    std::clamp(curr_steer_rate, -max_steer_rate_from_jerk, max_steer_rate_from_jerk);
+
+  // Apply the limited steering rate
+  input.lateral.steering_tire_rotation_rate = limited_steer_rate;
+  input.lateral.steering_tire_angle =
+    prev_cmd_.lateral.steering_tire_angle + limited_steer_rate * dt;
+}
+
 void VehicleCmdFilter::filterAll(
   const double dt, const double current_steer_angle, Control & cmd,
   IsFilterActivated & is_activated) const
@@ -167,6 +192,7 @@ void VehicleCmdFilter::filterAll(
   const auto cmd_orig = cmd;
   limitLateralSteer(cmd);
   limitLateralSteerRate(dt, cmd);
+  limitLateralSteerRateWithLatJerk(dt, cmd);
   limitLongitudinalWithJerk(dt, cmd);
   limitLongitudinalWithAcc(dt, cmd);
   limitLongitudinalWithVel(cmd);

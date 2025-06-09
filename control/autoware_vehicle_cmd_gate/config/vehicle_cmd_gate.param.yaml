@@ -21,6 +21,7 @@
       acc_diff_lim_from_lon_jerk: [80.0, 5.0, 5.0, 4.0] # The first element is required for quick pedal changes when stopping and starting.
       steer_lim_from_lat_acc: [5.0, 5.0, 5.0, 4.0]
       steer_lim_from_lat_jerk: [7.0, 7.0, 7.0, 6.0]
+      steer_rate_lim_from_lat_jerk: 10.0
       actual_steer_diff_lim: [1.0, 1.0, 1.0, 0.8]
     on_transition:
       vel_lim: 50.0
@@ -31,4 +32,5 @@
       acc_diff_lim_from_lon_jerk: [0.5, 0.4]
       steer_lim_from_lat_acc: [2.0, 1.8]
       steer_lim_from_lat_jerk: [7.0, 6.0]
+      steer_rate_lim_from_lat_jerk: 8.0
       actual_steer_diff_lim: [1.0, 0.8]
