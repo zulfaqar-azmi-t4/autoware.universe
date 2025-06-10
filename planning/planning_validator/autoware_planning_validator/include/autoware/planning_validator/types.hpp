@@ -38,9 +38,9 @@
 
 namespace autoware::planning_validator
 {
+using autoware::route_handler::RouteHandler;
 using autoware_map_msgs::msg::LaneletMapBin;
 using autoware_planning_msgs::msg::LaneletRoute;
-using autoware::route_handler::RouteHandler;
 using autoware_planning_msgs::msg::Trajectory;
 using autoware_planning_msgs::msg::TrajectoryPoint;
 using autoware_planning_validator::msg::PlanningValidatorStatus;
