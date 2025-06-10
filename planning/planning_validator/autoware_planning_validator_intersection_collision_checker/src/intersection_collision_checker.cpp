@@ -135,11 +135,11 @@ void IntersectionCollisionChecker::validate(bool & is_critical)
     is_critical = false;
   };
 
-  if (!context_->data->current_pointcloud) {
+  if (!context_->data->obstacle_pointcloud) {
     return skip_validation("point cloud data is not available, skipping collision check.");
   }
 
-  if (!context_->route_handler->isHandlerReady()) {
+  if (!context_->data->route_handler->isHandlerReady()) {
     return skip_validation("route handler is not ready, skipping collision check.");
   }
 
@@ -166,7 +166,7 @@ void IntersectionCollisionChecker::validate(bool & is_critical)
 
   context_->validation_status->is_valid_collision_check = check_collision(
     lanelets.target_lanelets, filtered_pointcloud,
-    context_->data->current_pointcloud->header.stamp);
+    context_->data->obstacle_pointcloud->header.stamp);
 
   if (!context_->validation_status->is_valid_collision_check) {
     last_invalid_time_ = context_->data->obstacle_pointcloud->header.stamp;

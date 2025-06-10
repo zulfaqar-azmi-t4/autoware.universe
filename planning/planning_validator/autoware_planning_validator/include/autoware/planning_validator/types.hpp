@@ -173,7 +173,6 @@ struct PlanningValidatorContext
   std::shared_ptr<Updater> diag_updater = nullptr;
   std::shared_ptr<PlanningValidatorData> data = nullptr;
   std::shared_ptr<PlanningValidatorStatus> validation_status = nullptr;
-  std::shared_ptr<RouteHandler> route_handler = nullptr;
 
   tf2_ros::Buffer tf_buffer;
   tf2_ros::TransformListener tf_listener;
