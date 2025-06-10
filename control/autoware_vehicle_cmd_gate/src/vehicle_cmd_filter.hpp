@@ -62,7 +62,6 @@ public:
   void limitActualSteerDiff(const double current_steer_angle, Control & input) const;
   void limitLateralSteer(Control & input) const;
   void limitLateralSteerRate(const double dt, Control & input) const;
-  void limitLateralSteerRateWithLatJerk(const double dt, Control & input) const;
   void filterAll(
     const double dt, const double current_steer_angle, Control & input,
     IsFilterActivated & is_activated) const;
