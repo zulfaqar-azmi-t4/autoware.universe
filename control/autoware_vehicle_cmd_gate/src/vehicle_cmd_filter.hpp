@@ -46,6 +46,7 @@ class VehicleCmdFilter
 {
 public:
   VehicleCmdFilter();
+  explicit VehicleCmdFilter(rclcpp::Logger logger);
   ~VehicleCmdFilter() = default;
 
   void setWheelBase(double v) { param_.wheel_base = v; }
@@ -53,6 +54,7 @@ public:
   void setParam(const VehicleCmdFilterParam & p);
   VehicleCmdFilterParam getParam() const;
   void setPrevCmd(const Control & v) { prev_cmd_ = v; }
+  void setLogger(const rclcpp::Logger & logger) { logger_ = logger; }
 
   void limitLongitudinalWithVel(Control & input) const;
   void limitLongitudinalWithAcc(const double dt, Control & input) const;
@@ -72,6 +74,7 @@ private:
   VehicleCmdFilterParam param_;
   Control prev_cmd_;
   double current_speed_ = 0.0;
+  rclcpp::Logger logger_{rclcpp::get_logger("vehicle_cmd_filter")};
 
   bool setParameterWithValidation(const VehicleCmdFilterParam & p);
 

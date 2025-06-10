@@ -25,6 +25,10 @@ VehicleCmdFilter::VehicleCmdFilter() : param_()
 {
 }
 
+VehicleCmdFilter::VehicleCmdFilter(rclcpp::Logger logger) : param_(), logger_(logger)
+{
+}
+
 bool VehicleCmdFilter::setParameterWithValidation(const VehicleCmdFilterParam & p)
 {
   const auto s = p.reference_speed_points.size();
@@ -161,6 +165,13 @@ void VehicleCmdFilter::limitLateralSteerRate(const double dt, Control & input) c
   const float effective_steer_rate_lim =
     std::min(static_cast<double>(cmd_steer_rate_lim), max_steer_rate_from_jerk);
 
+  // Store original values for logging
+  const float original_steer_rate = input.lateral.steering_tire_rotation_rate;
+  const float original_steer_angle = input.lateral.steering_tire_angle;
+
+  // Calculate original lateral jerk for logging
+  const double original_lateral_jerk = (current_speed_ * current_speed_ / param_.wheel_base) * original_steer_rate;
+
   // Limit steering angle rate
   input.lateral.steering_tire_rotation_rate = std::clamp(
     input.lateral.steering_tire_rotation_rate, -effective_steer_rate_lim, effective_steer_rate_lim);
@@ -170,6 +181,26 @@ void VehicleCmdFilter::limitLateralSteerRate(const double dt, Control & input) c
   float ds = input.lateral.steering_tire_angle - prev_cmd_.lateral.steering_tire_angle;
   ds = std::clamp(ds, -steer_diff_limit, steer_diff_limit);
   input.lateral.steering_tire_angle = prev_cmd_.lateral.steering_tire_angle + ds;
+
+  // Log if steering rate was limited
+  if (std::abs(original_steer_rate - input.lateral.steering_tire_rotation_rate) > 1e-6) {
+    RCLCPP_ERROR(
+      logger_, "Steering rate limited: original=%.4f, limited=%.4f, limit=%.4f [rad/s], "
+               "vehicle_speed=%.4f [m/s], calculated_lateral_jerk=%.4f [m/s^3], "
+               "lateral_jerk_threshold=%.4f [m/s^3]",
+      original_steer_rate, input.lateral.steering_tire_rotation_rate, effective_steer_rate_lim,
+      current_speed_, original_lateral_jerk, steer_rate_lim_from_lat_jerk);
+  }
+
+  // Log if steering angle change was limited
+  if (std::abs(original_steer_angle - input.lateral.steering_tire_angle) > 1e-6) {
+    RCLCPP_ERROR(
+      logger_, "Steering angle change limited: original=%.4f, limited=%.4f, max_change=%.4f [rad], "
+               "vehicle_speed=%.4f [m/s], calculated_lateral_jerk=%.4f [m/s^3], "
+               "lateral_jerk_threshold=%.4f [m/s^3]",
+      original_steer_angle, input.lateral.steering_tire_angle, steer_diff_limit,
+      current_speed_, original_lateral_jerk, steer_rate_lim_from_lat_jerk);
+  }
 }
 
 void VehicleCmdFilter::filterAll(

@@ -145,6 +145,11 @@ VehicleCmdGate::VehicleCmdGate(const rclcpp::NodeOptions & node_options)
 
   // Vehicle Parameter
   const auto vehicle_info = autoware::vehicle_info_utils::VehicleInfoUtils(*this).getVehicleInfo();
+
+  // Set logger for filters
+  filter_.setLogger(this->get_logger());
+  filter_on_transition_.setLogger(this->get_logger());
+
   {
     VehicleCmdFilterParam p;
     p.wheel_base = vehicle_info.wheel_base_m;
