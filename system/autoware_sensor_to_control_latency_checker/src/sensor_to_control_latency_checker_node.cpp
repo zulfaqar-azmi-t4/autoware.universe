@@ -154,9 +154,9 @@ void SensorToControlLatencyCheckerNode::calculateTotalLatency()
       missing_data += "meas_to_tracked_object";
     }
 
-    RCLCPP_ERROR_THROTTLE(
-      get_logger(), *get_clock(), 1000,
-      "Input data is insufficient for latency calculation. Missing: %s", missing_data.c_str());
+    // RCLCPP_ERROR_THROTTLE(
+    //   get_logger(), *get_clock(), 1000,
+    //   "Input data is insufficient for latency calculation. Missing: %s", missing_data.c_str());
     return;
   }
 
@@ -335,9 +335,9 @@ void SensorToControlLatencyCheckerNode::checkTotalLatency(
     }
 
     stat.add("uninitialized_data", uninitialized_data);
-    RCLCPP_ERROR_THROTTLE(
-      get_logger(), *get_clock(), 1000, "Input data is not initialized: %s",
-      uninitialized_data.c_str());
+    // RCLCPP_ERROR_THROTTLE(
+    //   get_logger(), *get_clock(), 1000, "Input data is not initialized: %s",
+    //   uninitialized_data.c_str());
     stat.summary(
       diagnostic_msgs::msg::DiagnosticStatus::ERROR,
       "Some latency data not yet initialized: " + uninitialized_data);
