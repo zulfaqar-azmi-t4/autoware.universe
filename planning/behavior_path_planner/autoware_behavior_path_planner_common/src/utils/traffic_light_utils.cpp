@@ -94,12 +94,6 @@ std::optional<double> calcDistanceToRedTrafficLight(
         continue;
       }
 
-      if (autoware::traffic_light_utils::hasTrafficLightCircleColor(
-            traffic_signal_stamped.value().signal,
-            autoware_perception_msgs::msg::TrafficLightElement::UNKNOWN)) {
-        continue;
-      }
-
       if (!autoware::traffic_light_utils::isTrafficSignalStop(
             lanelet, traffic_signal_stamped.value().signal)) {
         continue;
