@@ -20,6 +20,8 @@
 #include <range/v3/view.hpp>
 #include <tf2/convert.hpp>
 
+#include <fmt/format.h>
+
 #include <algorithm>
 #include <unordered_set>
 #include <utility>
@@ -300,16 +302,13 @@ void update_critical_departure_points(
 
 std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
   const trajectory::Trajectory<TrajectoryPoint> & ref_traj_pts,
-  const DepartureIntervals & departure_intervals,
-  const SlowDownInterpolator & slow_down_interpolator, const VehicleInfo & vehicle_info,
-  [[maybe_unused]] const BoundarySideWithIdx & boundary_segments, const double curr_vel,
+  DepartureIntervals & departure_intervals, const SlowDownInterpolator & slow_down_interpolator,
+  const VehicleInfo & vehicle_info, const double curr_vel, const TriggerThreshold & th_trigger,
   const double ego_dist_on_traj_m)
 {
   std::vector<std::tuple<Pose, Pose, double>> slowdown_intervals;
 
-  for (auto && pair : departure_intervals | ranges::views::enumerate) {
-    const auto & [idx, departure_interval] = pair;
-
+  for (auto && [idx, departure_interval] : departure_intervals | ranges::views::enumerate) {
     const auto [slow_down_pt_on_traj, slow_down_dist_on_traj_m] =
       (ego_dist_on_traj_m < departure_interval.start_dist_on_traj)
         ? std::make_pair(
@@ -329,6 +328,7 @@ std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
       });
 
     if (lat_dist_to_bound_itr == candidates.end()) {
+      fmt::print("couldn't find iteration\n");
       continue;
     }
 
@@ -338,16 +338,7 @@ std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
       curr_vel, lon_dist_to_bound_m, lat_dist_to_bound_m, departure_interval.side_key);
 
     if (!vel_opt) {
-      continue;
-    }
-
-    const auto dist_to_departure_point =
-      (departure_interval.start_dist_on_traj >
-       (ego_dist_on_traj_m + vehicle_info.max_longitudinal_offset_m))
-        ? departure_interval.start_dist_on_traj
-        : departure_interval.end_dist_on_traj;
-
-    if (ego_dist_on_traj_m >= dist_to_departure_point) {
+      fmt::print("unable to find velocity\n");
       continue;
     }
 
@@ -358,12 +349,18 @@ std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
                       ? departure_interval.start.pose
                       : departure_interval.end.pose;
     if (ego_dist_on_traj_m + rel_dist_m > ref_traj_pts.length()) {
+      fmt::print("dist is longer than rel_dist\n");
       continue;
     }
 
-    auto start_pose = ref_traj_pts.compute(ego_dist_on_traj_m + rel_dist_m);
+    departure_interval.prev_vel = std::clamp(
+      vel, th_trigger.th_vel_mps.min,
+      std::min(departure_interval.prev_vel, th_trigger.th_vel_mps.max));
 
-    slowdown_intervals.emplace_back(start_pose.pose, end_pose, vel);
+    auto start_pose = ref_traj_pts.compute(ego_dist_on_traj_m + rel_dist_m);
+    fmt::print("slow down vel: {} [m/s]\n", autoware_utils_math::mps2kmph(vel));
+
+    slowdown_intervals.emplace_back(start_pose.pose, end_pose, departure_interval.prev_vel);
   }
 
   return slowdown_intervals;
