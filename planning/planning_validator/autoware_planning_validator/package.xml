@@ -18,6 +18,7 @@
   <build_depend>rosidl_default_generators</build_depend>
 
   <depend>autoware_motion_utils</depend>
+  <depend>autoware_planning_factor_interface</depend>
   <depend>autoware_planning_msgs</depend>
   <depend>autoware_planning_test_manager</depend>
   <depend>autoware_route_handler</depend>
