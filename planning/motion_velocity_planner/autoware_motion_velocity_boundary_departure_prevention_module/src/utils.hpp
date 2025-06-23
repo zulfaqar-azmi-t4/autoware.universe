@@ -182,16 +182,14 @@ void update_critical_departure_points(
  * @param departure_intervals  Boundary-departure intervals to check.
  * @param slow_down_interpolator  Provides (rel_dist, vel, accel) lookup.
  * @param vehicle_info         Needed for longitudinal footprint checks.
- * @param boundary_segments     (reserved, currently unused)
  * @param curr_vel             Current ego speed [m/s].
  * @param ego_dist_on_traj_m   Ego arc-length position on the trajectory.
  * @return Vector of (start_pose, end_pose, target_vel) triples.
  */
 std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
   const trajectory::Trajectory<TrajectoryPoint> & ref_traj_pts,
-  const DepartureIntervals & departure_intervals,
-  const SlowDownInterpolator & slow_down_interpolator, const VehicleInfo & vehicle_info,
-  const BoundarySideWithIdx & boundary_segments, const double curr_vel,
+  DepartureIntervals & departure_intervals, const SlowDownInterpolator & slow_down_interpolator,
+  const VehicleInfo & vehicle_info, const double curr_vel, const TriggerThreshold & th_trigger,
   const double ego_dist_on_traj_m);
 
 /**
