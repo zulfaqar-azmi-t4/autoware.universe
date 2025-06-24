@@ -36,7 +36,11 @@ public:
     double expected_decel;
   };
 
-  explicit SlowDownInterpolator(const TriggerThreshold & th_trigger) : th_trigger_(th_trigger) {}
+  explicit SlowDownInterpolator(const TriggerThreshold & th_trigger)
+  : th_trigger_(th_trigger),
+    time_jerk_limited_s_(th_trigger_.th_acc_mps2.max / th_trigger_.th_jerk_mps3.max)
+  {
+  }
 
   /**
    * @brief Calculates a deceleration plan for the ego vehicle toward the boundary.
@@ -143,7 +147,13 @@ private:
 
   [[nodiscard]] double calc_max_accel_jerk_time() const;
 
+  static double calc_time_to_departure(const double vel_mps, const double lon_dist_to_bound_m);
+
+  [[nodiscard]] bool is_exceeded_ttd_th(
+    const double vel_mps, const double lon_dist_to_bound_m) const;
+
   TriggerThreshold th_trigger_;
+  double time_jerk_limited_s_{std::numeric_limits<double>::max()};
 };
 
 }  // namespace autoware::motion_velocity_planner::experimental::utils

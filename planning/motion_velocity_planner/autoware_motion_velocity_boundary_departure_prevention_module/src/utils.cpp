@@ -57,6 +57,7 @@ DepartureIntervals init_departure_intervals(
     interval.start_dist_on_traj = departure_points[idx].dist_on_traj;
     interval.candidates.push_back(departure_points[idx]);
     interval.side_key = side_key;
+    double min_lat_dist_to_bound = std::numeric_limits<double>::max();
 
     size_t idx_end = idx + 1;
 
@@ -84,6 +85,7 @@ DepartureIntervals init_departure_intervals(
       if (diff >= vehicle_length_m) {
         break;
       }
+      min_lat_dist_to_bound = std::min(min_lat_dist_to_bound, curr.lat_dist_to_bound);
       interval.candidates.push_back(curr);
       ++idx_end;
     }
@@ -92,6 +94,7 @@ DepartureIntervals init_departure_intervals(
       continue;
     }
 
+    interval.min_lat_dist_to_bound = min_lat_dist_to_bound;
     interval.end = aw_ref_traj.compute(interval.candidates.back().dist_on_traj);
     interval.end_dist_on_traj = interval.candidates.back().dist_on_traj;
     departure_intervals.push_back(interval);
@@ -173,6 +176,10 @@ void check_departure_points_between_intervals(
       if (!has_type(enable_type, departure_point.departure_type)) {
         continue;
       }
+
+      departure_interval.min_lat_dist_to_bound =
+        std::min(departure_interval.min_lat_dist_to_bound, departure_point.lat_dist_to_bound);
+
       if (
         departure_point.dist_on_traj >= departure_interval.start_dist_on_traj &&
         departure_point.dist_on_traj <= departure_interval.end_dist_on_traj) {
@@ -309,6 +316,7 @@ std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
   std::vector<std::tuple<Pose, Pose, double>> slowdown_intervals;
 
   for (auto && [idx, departure_interval] : departure_intervals | ranges::views::enumerate) {
+    fmt::print("Idx {} \n", idx);
     const auto [slow_down_pt_on_traj, slow_down_dist_on_traj_m] =
       (ego_dist_on_traj_m < departure_interval.start_dist_on_traj)
         ? std::make_pair(
@@ -320,25 +328,13 @@ std::vector<std::tuple<Pose, Pose, double>> get_slow_down_intervals(
 
     const auto lon_dist_to_bound_m = slow_down_dist_on_traj_m - ego_dist_on_traj_m;
 
-    const auto & candidates = departure_interval.candidates;
-    const auto lat_dist_to_bound_itr = std::min_element(
-      candidates.begin(), candidates.end(),
-      [](const DeparturePoint & pt1, const DeparturePoint & pt2) {
-        return pt1.lat_dist_to_bound < pt2.lat_dist_to_bound;
-      });
-
-    if (lat_dist_to_bound_itr == candidates.end()) {
-      fmt::print("couldn't find iteration\n");
-      continue;
-    }
-
-    const auto lat_dist_to_bound_m = lat_dist_to_bound_itr->lat_dist_to_bound;
+    const auto lat_dist_to_bound_m = departure_interval.min_lat_dist_to_bound;
 
     const auto vel_opt = slow_down_interpolator.get_interp_to_point(
       curr_vel, lon_dist_to_bound_m, lat_dist_to_bound_m, departure_interval.side_key);
 
     if (!vel_opt) {
-      fmt::print("unable to find velocity\n");
+      fmt::print("{}\n", vel_opt.error());
       continue;
     }
 
