@@ -20,7 +20,7 @@
 #include <autoware/planning_validator/plugin_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include <autoware_internal_planning_msgs/msg/safety_factor_array.hpp>
+#include <tier4_planning_msgs/msg/safety_factor_array.hpp>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -32,8 +32,8 @@ namespace autoware::planning_validator
 {
 using sensor_msgs::msg::PointCloud2;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using autoware_internal_planning_msgs::msg::SafetyFactor;
-using autoware_internal_planning_msgs::msg::SafetyFactorArray;
+using tier4_planning_msgs::msg::SafetyFactor;
+using tier4_planning_msgs::msg::SafetyFactorArray;
 
 class IntersectionCollisionChecker : public PluginInterface
 {

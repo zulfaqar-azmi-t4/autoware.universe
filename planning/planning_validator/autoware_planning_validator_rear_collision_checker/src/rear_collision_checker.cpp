@@ -26,8 +26,8 @@
 #include <autoware_utils/transform/transforms.hpp>
 #include <magic_enum.hpp>
 
-#include <autoware_internal_planning_msgs/msg/planning_factor.hpp>
-#include <autoware_internal_planning_msgs/msg/safety_factor_array.hpp>
+#include <tier4_planning_msgs/msg/planning_factor.hpp>
+#include <tier4_planning_msgs/msg/safety_factor_array.hpp>
 
 #include <pcl/filters/crop_hull.h>
 #include <pcl/filters/extract_indices.h>
@@ -53,9 +53,9 @@
 
 namespace autoware::planning_validator
 {
-using autoware_internal_planning_msgs::msg::PlanningFactor;
-using autoware_internal_planning_msgs::msg::SafetyFactor;
-using autoware_internal_planning_msgs::msg::SafetyFactorArray;
+using tier4_planning_msgs::msg::PlanningFactor;
+using tier4_planning_msgs::msg::SafetyFactor;
+using tier4_planning_msgs::msg::SafetyFactorArray;
 using autoware_utils::get_or_declare_parameter;
 
 void RearCollisionChecker::init(
