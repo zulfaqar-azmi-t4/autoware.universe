@@ -153,7 +153,6 @@ bool PlanningValidatorNode::isAllValid(const PlanningValidatorStatus & s) const
          s.is_valid_longitudinal_distance_deviation && s.is_valid_forward_trajectory_length &&
          s.is_valid_latency && s.is_valid_yaw_deviation && s.is_valid_trajectory_shift &&
          s.is_valid_intersection_collision_check;
-
 }
 
 void PlanningValidatorNode::publishTrajectory()

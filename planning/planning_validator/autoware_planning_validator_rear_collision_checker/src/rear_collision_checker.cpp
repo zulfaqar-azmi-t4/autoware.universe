@@ -53,10 +53,10 @@
 
 namespace autoware::planning_validator
 {
+using autoware_utils::get_or_declare_parameter;
 using tier4_planning_msgs::msg::PlanningFactor;
 using tier4_planning_msgs::msg::SafetyFactor;
 using tier4_planning_msgs::msg::SafetyFactorArray;
-using autoware_utils::get_or_declare_parameter;
 
 void RearCollisionChecker::init(
   rclcpp::Node & node, const std::string & name,
