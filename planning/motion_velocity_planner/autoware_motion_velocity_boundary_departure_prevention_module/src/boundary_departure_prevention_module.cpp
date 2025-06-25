@@ -398,7 +398,7 @@ BoundaryDeparturePreventionModule::plan_slow_down_intervals(
 
   if (output_.departure_intervals.empty()) {
     output_.departure_intervals = utils::init_departure_intervals(
-      *ref_traj_pts_opt, output_.departure_points,
+      *ref_traj_pts_opt, output_.departure_points, curr_odom.twist.twist.linear.x,
       ego_dist_on_traj_with_offset_m(!planner_data->is_driving_forward),
       node_param_.slow_down_types);
   } else {
