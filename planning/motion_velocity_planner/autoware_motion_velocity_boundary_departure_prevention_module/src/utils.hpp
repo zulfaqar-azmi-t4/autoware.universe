@@ -118,8 +118,8 @@ inline Point2d to_pt2d(const geometry_msgs::msg::Point & point)
  */
 DepartureIntervals init_departure_intervals(
   const trajectory::Trajectory<TrajectoryPoint> & aw_ref_traj,
-  const Side<DeparturePoints> & departure_points, const double vehicle_length,
-  const std::unordered_set<DepartureType> & enable_type);
+  const Side<DeparturePoints> & departure_points, const double curr_vel,
+  const double vehicle_length, const std::unordered_set<DepartureType> & enable_type);
 
 /**
  * @brief Update and merge departure intervals based on current trajectory and ego state.
