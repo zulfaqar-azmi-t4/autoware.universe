@@ -24,6 +24,7 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <limits>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -202,6 +203,66 @@ void check_departure_points_between_intervals(
   }
 }
 
+void merge_departure_intervals(
+  DepartureIntervals & departure_intervals, DepartureIntervals & merged,
+  const size_t check_start_idx, const SideKey side_key, const double tolerance)
+{
+  const auto is_start_end_close = [](double from, double to, double tolerance) {
+    const auto diff = to - from;
+    return diff <= tolerance && diff > -std::numeric_limits<double>::epsilon();
+  };
+  const auto is_between_interval = [](double val, const DepartureInterval & interval) {
+    return interval.start_at_traj_front <= val && val <= interval.end_dist_on_traj;
+  };
+
+  for (size_t i = check_start_idx; i < departure_intervals.size(); ++i) {
+    auto & next_mut = departure_intervals[i];
+    const auto is_same_direction = next_mut.side_key == side_key;
+    if (!is_same_direction || next_mut.has_merged) {
+      continue;
+    }
+
+    auto & curr_mut = merged.back();
+
+    // check if the curr interval end is before next interval start, check if they are close
+    // to each other, join them
+    const auto is_curr_end_near_next_start =
+      is_start_end_close(curr_mut.end_dist_on_traj, next_mut.start_dist_on_traj, tolerance);
+    if (is_curr_end_near_next_start) {
+      curr_mut.end = next_mut.end;
+      curr_mut.end_dist_on_traj = next_mut.end_dist_on_traj;
+      next_mut.has_merged = true;
+      continue;
+    }
+
+    const auto is_curr_start_near_next_end =
+      is_start_end_close(next_mut.end_dist_on_traj, curr_mut.start_dist_on_traj, tolerance);
+    if (is_curr_start_near_next_end) {
+      curr_mut.start = next_mut.start;
+      curr_mut.start_dist_on_traj = next_mut.start_dist_on_traj;
+      next_mut.has_merged = true;
+      continue;
+    }
+
+    const auto is_end_in_between = is_between_interval(next_mut.end_dist_on_traj, curr_mut);
+    const auto is_start_in_between = is_between_interval(next_mut.start_dist_on_traj, curr_mut);
+
+    if (is_start_in_between && !is_end_in_between) {
+      curr_mut.end = next_mut.end;
+      curr_mut.end_dist_on_traj = next_mut.end_dist_on_traj;
+      next_mut.has_merged = true;
+    } else if (!is_start_in_between && is_end_in_between) {
+      curr_mut.start = next_mut.start;
+      curr_mut.start_dist_on_traj = next_mut.start_dist_on_traj;
+      next_mut.has_merged = true;
+    } else if (is_start_in_between && is_end_in_between) {
+      next_mut.has_merged = true;
+    } else {
+      merged.push_back(next_mut);
+    }
+  }
+}
+
 void update_departure_intervals(
   DepartureIntervals & departure_intervals, Side<DeparturePoints> & departure_points,
   const trajectory::Trajectory<TrajectoryPoint> & aw_ref_traj, const double vehicle_length_m,
@@ -226,52 +287,25 @@ void update_departure_intervals(
     departure_intervals.size());
   if (!departure_intervals.empty()) {
     DepartureIntervals merged;
-    merged.push_back(departure_intervals.front());
-
-    for (size_t i = 1; i < departure_intervals.size(); ++i) {
-      auto & next_interval_mut = departure_intervals[i];
-      auto & curr_interval_mut = merged.back();
-      const auto is_same_direction = curr_interval_mut.side_key == next_interval_mut.side_key;
-      if (!is_same_direction) {
-        merged.push_back(next_interval_mut);
+    for (const auto side_key : g_side_keys) {
+      size_t idx{0};
+      for (auto & departure_interval : departure_intervals) {
+        if (departure_interval.side_key != side_key) {
+          continue;
+        }
+        if (departure_interval.has_merged) {
+          continue;
+        }
+        merged.push_back(departure_interval);
+        departure_interval.has_merged = true;
+        ++idx;
+        break;
       }
 
-      // const auto is_curr_start_near_next_start_ =
-      //   std::abs(curr_interval_mut.start_dist_on_traj - next_interval_mut.start_dist_on_traj) <
-      //   vehicle_length_m;
-      // const auto is_curr_start_near_next_end =
-      //   std::abs(curr_interval_mut.start_dist_on_traj - next_interval_mut.end_dist_on_traj) <
-      //   vehicle_length_m;
-      // const auto is_curr_end_near_next_start =
-      //   std::abs(curr_interval_mut.end_dist_on_traj - next_interval_mut.start_dist_on_traj) <
-      //   vehicle_length_m;
-      // const auto is_curr_end_near_next_end =
-      //   std::abs(curr_interval_mut.end_dist_on_traj - next_interval_mut.end_dist_on_traj) <
-      //   vehicle_length_m;
+      merge_departure_intervals(departure_intervals, merged, idx, side_key, vehicle_length_m);
 
-      const auto is_end_in_between =
-        curr_interval_mut.start_dist_on_traj <= next_interval_mut.end_dist_on_traj &&
-        next_interval_mut.end_dist_on_traj <= curr_interval_mut.end_dist_on_traj;
-      const auto is_start_in_between =
-        curr_interval_mut.start_dist_on_traj <= next_interval_mut.start_dist_on_traj &&
-        next_interval_mut.start_dist_on_traj <= curr_interval_mut.end_dist_on_traj;
-
-      if (is_start_in_between && !is_end_in_between) {
-        curr_interval_mut.end = next_interval_mut.end;
-        curr_interval_mut.end_dist_on_traj = next_interval_mut.end_dist_on_traj;
-        next_interval_mut.has_merged = true;
-      } else if (!is_start_in_between && is_end_in_between) {
-        curr_interval_mut.start = next_interval_mut.start;
-        curr_interval_mut.start_dist_on_traj = next_interval_mut.start_dist_on_traj;
-        next_interval_mut.has_merged = true;
-      } else if (is_start_in_between && is_end_in_between) {
-        next_interval_mut.has_merged = true;
-      } else {
-        merged.push_back(next_interval_mut);
-      }
+      departure_intervals = merged;
     }
-
-    departure_intervals = merged;
   }
   fmt::print("merged {} dpt interval size {}\n", __func__, departure_intervals.size());
 }
